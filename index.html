@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
     <title>Based Chat</title>
 
     <script>
@@ -21,10 +22,10 @@
 
         // This is called when the user sends a message 
         function addMessageWithClick() {
-            let messageText = document.getElementById("chat-user-input").value;
-            let sender = "Erik";
+            let messageText = document.getElementById("chat-msg-input").value;
+            let sender = document.getElementById("chat-sender-input").value;
             addMessage(messageText, sender);
-            document.getElementById("chat-user-input").value = "";
+            document.getElementById("chat-msg-input").value = "";
         }
 
 
@@ -39,7 +40,8 @@
         </div>
 
         <div class="chat-input-container">
-            <input type="text" class="message-input" id="chat-user-input">
+            <input type="text" class="message-input" id="chat-sender-input">
+            <input type="text" class="message-input" id="chat-msg-input">
             <button class="send-button" onclick="addMessageWithClick()">Send</button>
           </div>
         

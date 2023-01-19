@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Based Chat</title>
+
+    <script>
+        // This is called when a message is supposed to be displayed
+        function addMessage(text, sender) {
+            // Create the "div" element to hold the message
+            let message = document.createElement("div");
+            message.className = "message";
+            message.innerHTML = `<span class="sender">${sender}</span>: ${text}`;
+
+            // Append the message to the chat log
+            let chatLog = document.getElementById("chat-log");
+            chatLog.appendChild(message);
+        }
+
+        // This is called when the user sends a message 
+        function addMessageWithClick() {
+            let messageText = document.getElementById("chat-user-input").value;
+            let sender = "Erik";
+            addMessage(messageText, sender);
+            document.getElementById("chat-user-input").value = "";
+        }
+
+
+    </script>
+</head>
+<body>
+
+
+    <div class="chat-container">
+
+        <div class="chat-log" id="chat-log">
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" class="message-input" id="chat-user-input">
+            <button class="send-button" onclick="addMessageWithClick()">Send</button>
+          </div>
+        
+    </div>
+    
+</body>
+</html>

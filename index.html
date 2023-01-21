@@ -8,6 +8,10 @@
     <title>Based Chat</title>
 
     <script>
+        
+        var display_name = '<?php echo $_SESSION["display_name"]; ?>';
+        console.log(display_name);
+
         // This is called when a message is supposed to be displayed
         function addMessage(text, sender) {
             // Create the "div" element to hold the message
@@ -40,7 +44,6 @@
         </div>
 
         <div class="chat-input-container">
-            <input type="text" class="message-input" id="chat-sender-input">
             <input type="text" class="message-input" id="chat-msg-input">
             <button class="send-button" onclick="addMessageWithClick()">Send</button>
           </div>

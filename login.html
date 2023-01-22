@@ -5,6 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+
+    <script>
+        // Check if the php script fails and returns an error
+        window.onload = function() {
+            let error = new URL(window.location).searchParams.get("error");
+        if (error) {
+            document.getElementById("error").innerHTML = error;
+        }
+
+
+        }
+    </script>
 </head>
 <body>
     <form action="checklogin.php" method="post">
@@ -13,6 +25,7 @@
         <input type="text" id="username" name="username"><br><br>
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br><br>
+        <p id="error"></p>
         <input type="submit" value="Submit">
       </form> 
       <div id="response"></div>

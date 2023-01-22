@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // The MySQL credentials
 $servername = "localhost";
 $username = "root";
@@ -28,15 +26,24 @@ if ($result->num_rows > 0) {
     if (password_verify($password, $hashed_password)) {
         // Retrieve and save the display name from the database
         $display_name = $row['display_name'];   
-        $_SESSION["display_name"] = $display_name;
+
+        session_start();
+        $_SESSION['display_name'] = $display_name;
+                
         // Redirect to the main page
         header("Location: index.html");
         exit;
     } else {
-        echo "Invalid username or password";
+        // Redirect back to the login page
+        header("Location: login.html?error=Username or password is wrong");
+        exit;
+
     }
 } else {
-    echo "username or password not in db";
+    // Redirect back to the login page
+    // (username is not in db)
+    header("Location: login.html?error=Username or password is wrong");
+    exit;
 }
 ?>
 

@@ -57,7 +57,7 @@
 
             // Check for keydowns (more specifically space)
             // While the input is focused --> user can send message by simply pressing enter
-            document.getElementB<yId("chat-msg-input").addEventListener("keydown", function(event) {
+            document.getElementById("chat-msg-input").addEventListener("keydown", function(event) {
                 if (event.key == "Enter") { 
                     addMessageWithClick();
                 }

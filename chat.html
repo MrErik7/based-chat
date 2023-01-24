@@ -33,6 +33,9 @@
             // Append the message to the chat log
             let chatLog = document.getElementById("chat-log");
             chatLog.appendChild(message);
+
+            // Scroll down in the chatlog
+            chatLog.scrollTop = chatLog.scrollHeight;
         }
 
         // This is called when the user sends a message 
@@ -51,6 +54,10 @@
                 if (xhr_session.readyState === 4 && xhr_session.status === 200) {
                     display_name = xhr_session.responseText;
                     console.log(display_name);
+                    
+                    // Display the welcome message
+                    document.getElementById("welcome-display-name").innerHTML = "Logged in as " + display_name;
+
                 }
             };
             xhr_session.send();
@@ -83,7 +90,7 @@
                 }
             };
             xhr.send();
-        }
+            }
 
         // When the site has been fully loaded --> run the setup
         window.onload = setup;
@@ -95,6 +102,9 @@
 
 <body>
 
+
+    <h1 class="brand-name">Based-Chat</h1>
+    <h2 id="welcome-display-name"></h2>
     <div class="chat-main-container">
 
         <div class="contact-container">

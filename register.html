@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
     <title>Register</title>
 </head>
+
 <body>
-    <form action="addlogin.php" method="post">
-        <h1>Register a new user:</h1>
-        <label for="display_name">Display name:</label>
-        <input type="text" id="display_name" name="display_name"><br><br>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Submit">
-      </form> 
-      <div id="response"></div>
+
+
+    <div class="register-form">
+        <h1 class="brand-name">Register:</h1>
+        <form action="addlogin.php" method="post">
+            <label for="display_name">Display name:</label>
+            <input type="text" id="display_name" name="display_name" class="form-control" placeholder="Enter your display name" required>            
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username"
+                required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password"
+                required>
+            <p id="error" class="error"></p>
+            <input type="submit" value="Submit" class="btn btn-primary btn-block">
+        </form>
+        <div id="response"></div>
+    </div>
+
+
 </body>
+
 </html>

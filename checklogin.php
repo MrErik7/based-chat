@@ -31,7 +31,7 @@ if ($result->num_rows > 0) {
         $_SESSION['display_name'] = $display_name;
                 
         // Redirect to the main page
-        header("Location: index.html");
+        header("Location: chat.html");
         exit;
     } else {
         // Redirect back to the login page

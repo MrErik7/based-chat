@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,7 +9,7 @@
     <title>Based Chat</title>
 
     <script>
-    
+
         // This is called when a message is supposed to be displayed
         function addMessage(text, sender, db) {
             if (db) {
@@ -17,7 +17,7 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open("POST", "insert_message.php", true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         // Handle the response from the server
                     }
@@ -57,21 +57,21 @@
 
             // Check for keydowns (more specifically space)
             // While the input is focused --> user can send message by simply pressing enter
-            document.getElementById("chat-msg-input").addEventListener("keydown", function(event) {
-                if (event.key == "Enter") { 
+            document.getElementById("chat-msg-input").addEventListener("keydown", function (event) {
+                if (event.key == "Enter") {
                     addMessageWithClick();
                 }
 
             });
 
             // Clear the chatlog - since this runs evertytime the document is initialized it will create a bunch of copies and this will prevent that :D
-           // document.getElementById("chat-log").innerHTML = "";
+            // document.getElementById("chat-log").innerHTML = "";
 
             // Retrieve the messages from the database and display them
             // Send a GET request to retrieve the messages
             let xhr = new XMLHttpRequest();
             xhr.open("GET", "retrieve_messages.php", true);
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     let messages = JSON.parse(xhr.responseText);
 
@@ -92,20 +92,34 @@
 
     </script>
 </head>
+
 <body>
 
+    <div class="chat-main-container">
 
-    <div class="chat-container">
-
-        <div class="chat-log" id="chat-log">
+        <div class="contact-container">
+            <h1>John Doe</h1>
+            <h1>John Doe</h1>
+            <h1>John Doe</h1>
+            <h1>John Doe</h1>
+            <h1>John Doe</h1>
+            <h1>John Doe</h1>
         </div>
 
-        <div class="chat-input-container">
-            <input type="text" class="message-input" id="chat-msg-input">
-            <button class="send-button" onclick="addMessageWithClick()">Send</button>
-          </div>
-        
-    </div>
-    
+
+
+        <div class="chat-container">
+
+            <div class="chat-log" id="chat-log">
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="message-input" id="chat-msg-input">
+                <button class="send-button" onclick="addMessageWithClick()">Send</button>
+            </div>
+
+        </div>
+
 </body>
+
 </html>

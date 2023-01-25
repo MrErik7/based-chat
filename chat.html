@@ -15,7 +15,7 @@
             if (db) {
                 // First send a request to upload the message to the database logs
                 let xhr = new XMLHttpRequest();
-                xhr.open("POST", "insert_message.php", true);
+                xhr.open("POST", "php/insert_message.php", true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -46,7 +46,17 @@
         }
 
         // This method adds a new contact to the database, 
-        function addContact(display_name) {
+        function addContact(contact_display_name) {
+            // First send a request to upload the message to the database logs
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "php/insert_contact.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Handle the response from the server
+                }
+            };
+            xhr.send("user_display_name=" + display_name + "&contact_name=" + contact_display_name);
 
         }
 
@@ -82,7 +92,7 @@
             // Retrieve the messages from the database and display them
             // Send a GET request to retrieve the messages
             let xhr = new XMLHttpRequest();
-            xhr.open("GET", "retrieve_messages.php", true);
+            xhr.open("GET", "php/retrieve_messages.php", true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     let messages = JSON.parse(xhr.responseText);

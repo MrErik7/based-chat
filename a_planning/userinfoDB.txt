@@ -1,0 +1,7 @@
+personal_display_name = "Bob"
+
+(array that simply appends)
+contact_names = "Bob1, bob2, bob3"
+chatrooms = 12343, 14354, 14321
+
+and contacts and chatrooms needs to be encrypted with argon2 standard + salt.

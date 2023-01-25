@@ -1,0 +1,3 @@
+personal_display_name = "Bob"
+contact_display_names = "Bob1, bob2, bob3"
+(array that simply appends)

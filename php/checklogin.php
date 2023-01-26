@@ -31,18 +31,18 @@ if ($result->num_rows > 0) {
         $_SESSION['display_name'] = $display_name;
                 
         // Redirect to the main page
-        header("Location: chat.html");
+        header("Location: /chat.html");
         exit;
     } else {
         // Redirect back to the login page
-        header("Location: login.html?error=Username or password is wrong");
+        header("Location: /login.html?error=Username or password is wrong");
         exit;
 
     }
 } else {
     // Redirect back to the login page
     // (username is not in db)
-    header("Location: login.html?error=Username or password is wrong");
+    header("Location: /login.html?error=Username or password is wrong");
     exit;
 }
 ?>

@@ -9,27 +9,35 @@
     <title>Based Chat</title>
 
     <script>
+        // Set global variables 
+        let display_name = "";
+        let timestamp = new Date().toUTCString(); //initialize with current timestamp
 
         // This is called when a message is supposed to be displayed
-        function addMessage(text, sender, db) {
+        function addMessage(text, sender, db_time, db) {
+            // Check if its a new message
             if (db) {
                 // First send a request to upload the message to the database logs
                 let xhr = new XMLHttpRequest();
                 xhr.open("POST", "php/insert_message.php", true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         // Handle the response from the server
+                        timestamp = xhr.responseText;
                     }
                 };
+                console.log(timestamp);
                 xhr.send("sender_name=" + sender + "&message_text=" + text);
+            } else {
+                timestamp = db_time;
             }
 
             // Create the "div" element to hold the message
             let message = document.createElement("div");
             message.className = "message";
-            message.innerHTML = `<span class="sender">${sender}</span>: ${text}`;
-
+            message.innerHTML = `${timestamp}</span> <span class="sender">${sender}</span>: ${text} <span class="timestamp">`;
             // Append the message to the chat log
             let chatLog = document.getElementById("chat-log");
             chatLog.appendChild(message);
@@ -41,7 +49,7 @@
         // This is called when the user sends a message 
         function addMessageWithClick() {
             let messageText = document.getElementById("chat-msg-input").value;
-            addMessage(messageText, display_name, true);
+            addMessage(messageText, display_name, 0, true); // Time will be passed as zero here but retrieved in the addmessage script
             document.getElementById("chat-msg-input").value = "";
         }
 
@@ -64,7 +72,7 @@
         function setup() {
             // Create a request to get data from the server (the display name in this case)
             var xhr_session = new XMLHttpRequest();
-            xhr_session.open("GET", "getSessionVariable.php?name=display_name", true);
+            xhr_session.open("GET", "php/getSessionVariable.php?name=display_name", true);
             xhr_session.onload = function () {
                 if (xhr_session.readyState === 4 && xhr_session.status === 200) {
                     display_name = xhr_session.responseText;
@@ -100,7 +108,7 @@
                     // Iterate through the messages and add them to the chat log
                     for (let i = 0; i < messages.length; i++) {
                         let message = messages[i];
-                        addMessage(message.message_text, message.sender_name, false);
+                        addMessage(message.message_text, message.sender_name, message.timestamp, false);
                     }
                 }
             };

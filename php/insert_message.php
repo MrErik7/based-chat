@@ -29,7 +29,9 @@ if(empty($sender_name) || empty($message_text)) {
 
     // Execute the query
     if ($conn->query($sql) === TRUE) {
-        echo "New record created successfully";
+        // Successful
+        $timestamp = $conn->query("SELECT timestamp FROM messages ORDER BY timestamp DESC LIMIT 1")->fetch_object()->timestamp;
+        echo $timestamp;    
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

@@ -14,31 +14,32 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+ 
+// Prepare the SQL query
+$sql = "SELECT sender_name, message_text, timestamp FROM messages";
+$result = $conn->query($sql);
 
-// Get the user display name from the request
-$user_display_name = $_POST["user_display_name"];
+// Check if there are any results
+if ($result->num_rows > 0) {
+    // Create an array to hold the messages
+    $messages = array();
 
-// Validate the input
-if(empty($user_display_name)) {
-    // if input is empty
-    echo "user_display_name is required";
-} else {
-    // Prepare the SQL query
-    $sql = "SELECT contact_names FROM userinfo WHERE display_name = '$user_display_name'";
-
-    // Execute the query
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        // output data of each row
-        while($row = $result->fetch_assoc()) {
-            echo "Contacts: " . $row["contact_names"];
-        }
-    } else {
-        echo "No record found for user: " . $user_display_name;
+    // Iterate through the result and add each message to the array
+    while($row = $result->fetch_assoc()) {
+        $messages[] = $row;
     }
 
-    // Close the connection
-    $conn->close();
+    // Convert the array to a JSON string
+    $json = json_encode($messages);
+
+    // Return the JSON string to the JavaScript code
+    echo $json;
+    
+} else {
+    echo "No messages found";
 }
+
+// Close the connection
+$conn->close();
+
 ?>

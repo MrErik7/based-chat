@@ -36,7 +36,7 @@
         if ($result === TRUE) {
             echo "New record created successfully";
             error_log("a user has been crteated");
-            header("Location: login.html");
+            header("Location: /login.html");
             exit;
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;

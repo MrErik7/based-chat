@@ -18,6 +18,7 @@ if ($conn->connect_error) {
 // Get the message text and sender's name from the request
 $sender_name = $_POST["sender_name"];
 $message_text = $_POST["message_text"];
+$timestamp = $_POST["timestamp"];
 
 // Validate the input
 if(empty($sender_name) || empty($message_text)) {
@@ -25,13 +26,12 @@ if(empty($sender_name) || empty($message_text)) {
     echo "Both fields are required";
 } else {
     // Prepare the SQL query
-    $sql = "INSERT INTO messages (sender_name, recipent_name, message_text, timestamp) VALUES ('$sender_name', 'all', '$message_text', NOW())";
+    $sql = "INSERT INTO messages (sender_name, recipent_name, message_text, timestamp) VALUES ('$sender_name', 'all', '$message_text', '$timestamp')";
+
 
     // Execute the query
     if ($conn->query($sql) === TRUE) {
         // Successful
-        $timestamp = $conn->query("SELECT timestamp FROM messages ORDER BY timestamp DESC LIMIT 1")->fetch_object()->timestamp;
-        echo $timestamp;    
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

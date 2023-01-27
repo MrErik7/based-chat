@@ -14,7 +14,7 @@
         let timestamp = new Date().toUTCString(); //initialize with current timestamp
 
         // This is called when a message is supposed to be displayed
-        function addMessage(text, sender, db_time, db) {
+        function addMessage(text, sender, timestamp, db) {
             // Check if its a new message
             if (db) {
                 // First send a request to upload the message to the database logs
@@ -25,13 +25,10 @@
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         // Handle the response from the server
-                        timestamp = xhr.responseText;
+                        console.log("message sucess");
                     }
                 };
-                console.log(timestamp);
-                xhr.send("sender_name=" + sender + "&message_text=" + text);
-            } else {
-                timestamp = db_time;
+                xhr.send("sender_name=" + sender + "&message_text=" + text + "&timestamp=" + timestamp);
             }
 
             // Create the "div" element to hold the message
@@ -49,7 +46,9 @@
         // This is called when the user sends a message 
         function addMessageWithClick() {
             let messageText = document.getElementById("chat-msg-input").value;
-            addMessage(messageText, display_name, 0, true); // Time will be passed as zero here but retrieved in the addmessage script
+            var timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            addMessage(messageText, display_name, timestamp, true); // Time will be passed as zero here but retrieved in the addmessage script
             document.getElementById("chat-msg-input").value = "";
         }
 
@@ -104,6 +103,12 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     let messages = JSON.parse(xhr.responseText);
+
+                    // Check if any messages were found
+                    if (messages == "No messages found") {
+                        console.log("no message found its ok");
+                    }
+
 
                     // Iterate through the messages and add them to the chat log
                     for (let i = 0; i < messages.length; i++) {

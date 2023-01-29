@@ -7,6 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <title>Register</title>
+
+    <script>
+        // Check if the php script fails and returns an error
+        window.onload = function () {
+        let error = new URL(window.location).searchParams.get("error");
+        if (error) {
+            document.getElementById("error").innerHTML = error;
+        }
+
+
+        }
+    </script>
 </head>
 
 <body>

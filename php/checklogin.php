@@ -16,9 +16,13 @@ if ($conn->connect_error) {
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-// Get the data in the database
-$sql = "SELECT password, display_name FROM login WHERE username='$username'";
-$result = $conn->query($sql);
+// Get the data in the database using prepared statements
+$sql = "SELECT password, display_name FROM login WHERE username=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $hashed_password = $row['password'];
@@ -45,6 +49,5 @@ if ($result->num_rows > 0) {
     header("Location: /login.html?error=Username or password is wrong");
     exit;
 }
+$conn->close();
 ?>
-
-

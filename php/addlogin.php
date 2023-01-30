@@ -50,9 +50,34 @@ $stmt->bind_param("sss", $display_name, $username, $hashed_password);
 $result = $stmt->execute();
 
 if ($result === TRUE) {
+    // Now add the encryption key to the key file
+    // Path to the encryption_keys.txt file
+    // Hash the username using the password_hash function
+    $hashedUsername = password_hash($username, PASSWORD_BCRYPT);
+
+    // Now add the encryption key to the key file
+    // Path to the encryption_keys.txt file
+    $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
+
+    // Check if the file exists, if not create it
+    if (!file_exists($file)) {
+        $handle = fopen($file, 'w') or die('Cannot create the file');
+        fclose($handle);
+    }
+
+    // Generate a new AES key
+    $key = bin2hex(random_bytes(32));
+
+    // Append the hashed username and key to the file
+    $handle = fopen($file, 'a') or die('Cannot open the file');
+    fwrite($handle, $hashedUsername . ' | ' . $key . PHP_EOL);
+    fclose($handle);
+
+    // Redirect back to login
     error_log("A user has been created");
     header("Location: /login.html");
     exit;
+
 } else {
     echo "Error: " . $stmt->error;
 }

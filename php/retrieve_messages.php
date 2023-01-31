@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 }
 
 // Get the username from the URL
-$username = $_GET['username'];
+$username = "admin";//$_GET['username'];
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -43,11 +43,14 @@ if ($result->num_rows > 0) {
 
                 // Split the file contents into an array
                 $lines = explode("\n", $file_contents);
+                $encrypted_message = "";
 
-                // Iterate through the array and get the encryption key for the recipient
+                // Get the encryption key
                 foreach ($lines as $line) {
-                    $parts = explode(" - ", $line);
-                    $stored_username = $parts[0];
+                    $parts = explode(" | ", $line);
+                    print_r($parts[1]);
+
+                    //$stored_username = $parts[0];
                     $key = $parts[1];
 
                     if ($stored_username == $username) {
@@ -60,6 +63,7 @@ if ($result->num_rows > 0) {
                         break;
                     }
                 }
+          
             }
         }
     }

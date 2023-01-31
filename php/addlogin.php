@@ -52,9 +52,6 @@ $result = $stmt->execute();
 if ($result === TRUE) {
     // Now add the encryption key to the key file
     // Path to the encryption_keys.txt file
-    // Hash the username using the password_hash function
-    $hashedUsername = password_hash($username, PASSWORD_BCRYPT);
-
     // Now add the encryption key to the key file
     // Path to the encryption_keys.txt file
     $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -68,9 +65,9 @@ if ($result === TRUE) {
     // Generate a new AES key
     $key = bin2hex(random_bytes(32));
 
-    // Append the hashed username and key to the file
+    // Append the username and key to the file
     $handle = fopen($file, 'a') or die('Cannot open the file');
-    fwrite($handle, $hashedUsername . ' | ' . $key . PHP_EOL);
+    fwrite($handle, $username . ' | ' . $key . PHP_EOL);
     fclose($handle);
 
     // Redirect back to login

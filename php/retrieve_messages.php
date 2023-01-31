@@ -18,14 +18,11 @@ if ($conn->connect_error) {
 // Get the username from the URL
 $username = $_GET['username'];
 
-// Hash the username using password_hash function
-$hashedUsername = password_hash($username, PASSWORD_BCRYPT);
-
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
 
 // Prepare the SQL query
-$sql = "SELECT sender_name, recipent_name, message_text, timestamp FROM messages";
+$sql = "SELECT sender_name, recipient_name, message_text, timestamp FROM messages";
 $result = $conn->query($sql);
 
 // Check if there are any results
@@ -35,10 +32,10 @@ if ($result->num_rows > 0) {
 
     // Iterate through the result and add each message to the array
     while($row = $result->fetch_assoc()) {
-        $recipent_name = $row['recipent_name'];
+        $recipient_name = "admin";//$row['recipient_name'];
         $message = $row['message_text'];
 
-        if ($recipent_name == $username) {
+        if ($recipient_name == $username) {
             // Check if the file exists
             if (file_exists($file)) {
                 // Read the file
@@ -53,7 +50,7 @@ if ($result->num_rows > 0) {
                     $stored_username = $parts[0];
                     $key = $parts[1];
 
-                    if ($stored_username == $hashedUsername) {
+                    if ($stored_username == $username) {
                         // Decrypt the message using the key
                         $decrypted_message = openssl_decrypt($message, "AES-256-CBC", $key, 0, "1234567812345678");
 

@@ -16,9 +16,9 @@ if ($conn->connect_error) {
 }
 
 // Get the message text and sender's name from the request
-$sender_name = htmlspecialchars($_POST["sender_name"]);
-$message_text = htmlspecialchars($_POST["message_text"]);
-$timestamp = htmlspecialchars($_POST["timestamp"]);
+$sender_name = $_POST["sender_name"];
+$message_text = $_POST["message_text"];
+$timestamp = $_POST["timestamp"];
 
 // Validate the input
 if(empty($sender_name) || empty($message_text)) {
@@ -29,9 +29,6 @@ if(empty($sender_name) || empty($message_text)) {
 
 // Get the username from the URL
 $username = $_GET['username'];
-
-// Hash the username using password_hash function
-$hashedUsername = password_hash($username, PASSWORD_BCRYPT);
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -51,7 +48,7 @@ if (file_exists($file)) {
         $stored_username = $parts[0];
         $key = $parts[1];
 
-        if ($stored_username == $hashedUsername) {
+        if ($stored_username == $username) {
             $encrypted_message = openssl_encrypt($message_text, "AES-256-CBC", $key, 0, "1234567812345678");
             break;
         }
@@ -68,9 +65,13 @@ if (file_exists($file)) {
 
 
 // Prepare the SQL query
-$sql = "INSERT INTO messages (sender_name, recipent_name, message_text, timestamp) VALUES (?, ?, ?, ?)";
+$sql = "INSERT INTO messages (sender_name, recipient_name, message_text, timestamp) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssss", $sender_name, "all", $encrypted_message, $timestamp);
+
+$encrypted_message_value = $encrypted_message;
+$recipient_name = "admin";
+
+$stmt->bind_param("ssss", $sender_name, $recipient_name, $encrypted_message_value, $timestamp);
 
 // Execute the query
 if ($stmt->execute() === TRUE) {

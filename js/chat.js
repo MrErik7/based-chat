@@ -16,6 +16,7 @@ function addMessage(text, sender, timestamp, db) {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 // Handle the response from the server
                 console.log("message sucess");
+                console.log(xhr);
             }
         };
         xhr.send("sender_name=" + sender + "&message_text=" + text + "&timestamp=" + timestamp);

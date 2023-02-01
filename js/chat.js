@@ -116,7 +116,7 @@ function setup() {
             // Iterate through the messages and add them to the chat log
             for (let i = 0; i < messages.length; i++) {
                 let message = messages[i];
-                addMessage(message.message_text, message.sender_name, message.timestamp, false);
+                addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
             }
         }
     };

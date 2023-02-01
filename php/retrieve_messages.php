@@ -15,8 +15,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the display_name from the URL
-$display_name = $_GET['display_name'];
+// Get the display_name 
+$display_name = $_SESSION['display_name'];
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';

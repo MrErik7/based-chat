@@ -17,6 +17,7 @@ if ($conn->connect_error) {
 
 // Get the message text and sender's name from the request
 $sender_name = $_POST["sender_name"];
+$recipient_name = $_POST["recipient_name"];
 $message_text = $_POST["message_text"];
 $timestamp = $_POST["timestamp"];
 
@@ -69,7 +70,6 @@ $sql = "INSERT INTO messages (sender_name, recipient_name, message_text, timesta
 $stmt = $conn->prepare($sql);
 
 $encrypted_message_value = $encrypted_message;
-$recipient_name = "admin";
 
 $stmt->bind_param("ssss", $sender_name, $recipient_name, $encrypted_message_value, $timestamp);
 

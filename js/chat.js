@@ -4,7 +4,7 @@ let username = "";
 let timestamp = new Date().toUTCString(); //initialize with current timestamp
 
 // This is called when a message is supposed to be displayed
-function addMessage(text, sender, timestamp, db) {
+function addMessage(text, sender, recipient_name, timestamp, db) {
     // Check if its a new message
     if (db) {
         // First send a request to upload the message to the database logs
@@ -19,7 +19,7 @@ function addMessage(text, sender, timestamp, db) {
                 console.log(xhr);
             }
         };
-        xhr.send("sender_name=" + sender + "&message_text=" + text + "&timestamp=" + timestamp);
+        xhr.send("sender_name=" + sender + "&recipient_name=" + recipient_name + "&message_text=" + text + "&timestamp=" + timestamp);
     }
 
     // Create the "div" element to hold the message
@@ -37,9 +37,10 @@ function addMessage(text, sender, timestamp, db) {
 // This is called when the user sends a message 
 function addMessageWithClick() {
     let messageText = document.getElementById("chat-msg-input").value;
+    let receiver = document.getElementById("chat-contact-input").value;
     var timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    addMessage(messageText, display_name, timestamp, true); 
+    addMessage(messageText, display_name, receiver, timestamp, true); 
     document.getElementById("chat-msg-input").value = "";
 }
 
@@ -101,7 +102,7 @@ function setup() {
     // Retrieve the messages from the database and display them
     // Send a GET request to retrieve the messages
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "php/retrieve_messages.php?username=" + username, true);
+    xhr.open("GET", "php/retrieve_messages.php?display_name=" + display_name, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             let messages = JSON.parse(xhr.responseText);

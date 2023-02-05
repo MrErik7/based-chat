@@ -48,7 +48,7 @@ function addMessageWithClick() {
 function addContact(contact_display_name) {
     // First send a request to upload the message to the database logs
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/insert_contact.php", true);
+    xhr.open("POST", "php/insert_contact.php?username=" + username, true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -58,6 +58,13 @@ function addContact(contact_display_name) {
     xhr.send("user_display_name=" + display_name + "&contact_name=" + contact_display_name);
 
 }
+
+function addContactWithClick() {
+    let contact = document.getElementById("contact-user-input").value;
+    addContact(contact); 
+    document.getElementById("contact-user-input").value = "";
+}
+
 
 // This runs once when the site has been fully loaded
 function setup() {

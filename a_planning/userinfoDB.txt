@@ -5,3 +5,10 @@ contact_names = "Bob1, bob2, bob3"
 chatrooms = 12343, 14354, 14321
 
 and contacts and chatrooms needs to be encrypted with argon2 standard + salt.
+
+CREATE TABLE userinfo (
+    display_name VARCHAR(255) NOT NULL,
+    contacts TEXT,
+    chatrooms TEXT,
+    PRIMARY KEY (display_name)
+);

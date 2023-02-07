@@ -26,6 +26,7 @@ function addMessage(text, sender, recipient_name, timestamp, db) {
     let message = document.createElement("div");
     message.className = "message";
     message.innerHTML = `${timestamp}</span> <span class="sender">${sender}</span>: ${text} <span class="timestamp">`;
+    
     // Append the message to the chat log
     let chatLog = document.getElementById("chat-log");
     chatLog.appendChild(message);
@@ -45,23 +46,33 @@ function addMessageWithClick() {
 }
 
 // This method adds a new contact to the database, 
-function addContact(contact_display_name) {
-    // First send a request to upload the message to the database logs
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/insert_contact.php?username=" + username, true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // Handle the response from the server
-        }
-    };
-    xhr.send("user_display_name=" + display_name + "&contact_name=" + contact_display_name);
-
+function addContact(username, display_name, contact_display_name, db) {
+    if (db) {
+        // First send a request to upload the contact to the database
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "php/insert_contact.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle the response from the server
+            }
+        };
+        xhr.send("username=" + username + "&display_name=" + display_name + "&contact_display_name=" + contact_display_name);
+    }
+    
+   // Create the "div" element to hold the contact
+   let contact = document.createElement("div");
+   contact.className = "message";
+   contact.innerHTML = `${contact_display_name}`;
+   
+   // Append the message to the contact-list
+   let contactList = document.getElementById("contact-list");
+   contactList.appendChild(contact);
 }
 
 function addContactWithClick() {
-    let contact = document.getElementById("contact-user-input").value;
-    addContact(contact); 
+    let contact_display_name = document.getElementById("contact-user-input").value;
+    addContact(username, display_name, contact_display_name, true); 
     document.getElementById("contact-user-input").value = "";
 }
 
@@ -128,6 +139,33 @@ function setup() {
         }
     };
     xhr.send();
+
+    // Retrieve the contacts from the database and display them
+    // Send a GET request to retrieve the contacts
+    let xhr_contacts = new XMLHttpRequest();
+    xhr_contacts.open("POST", "php/retrieve_contacts.php", true);
+    xhr_contacts.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr_contacts.onreadystatechange = function () {
+        if (xhr_contacts.readyState === 4 && xhr_contacts.status === 200) {
+            let contacts = JSON.parse(xhr_contacts.responseText);
+
+            // Check if any messages were found
+            if (contacts == "0 results") {
+                console.log("no contacts found its ok");
+            }
+
+            console.log(contacts);
+
+
+            // Iterate through the messages and add them to the chat log
+            for (let i = 0; i < contacts.length; i++) {
+                let contact = contacts[i];
+                addContact(username, display_name, contact, false);
+            }
+        }
+        
+    };
+    xhr_contacts.send("username=" + username + "&display_name=" + display_name);
 }
 
 // When the site has been fully loaded --> run the setup

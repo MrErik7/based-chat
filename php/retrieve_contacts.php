@@ -15,10 +15,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the info from the request
-$username = $_POST['username'];
-$display_name = $_POST['display_name'];
-$contact_name = $_POST['contact_display_name'];
+// Get the display and user name from the request
+$display_name = "erik";//$_POST["display_name"];
+$username = "erik";//$_POST["username"];
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -38,10 +37,8 @@ if (file_exists($file)) {
         $stored_username = $parts[0];
         $key = $parts[1];
 
-        echo $stored_username;
-
         if ($stored_username == $username) {
-            $encrypted_contact_name = openssl_encrypt($contact_name, "AES-256-CBC", $key, 0, "1234567812345678");
+            $key = $parts[1];
             echo $key;
             break;
         }
@@ -51,11 +48,10 @@ if (file_exists($file)) {
     return;
 }
 
-
 // Validate the input
-if(empty($contact_name) || empty($display_name)) {
-    // if inputs are empty
-    echo "Both fields are required";
+if(empty($display_name)) {
+    // if the display name is empty
+    echo "Display name is required";
 } else {
     // Check if the record exists
     $check_sql = "SELECT * FROM userinfo WHERE display_name = ?";
@@ -64,32 +60,38 @@ if(empty($contact_name) || empty($display_name)) {
     $check_stmt->execute();
     $result = $check_stmt->get_result();
 
-    // Fix the encrypted contact
-    $encrypted_contact_name_value = $encrypted_contact_name;
-
     if ($result->num_rows > 0) {
-        // Record exists, update
+        // Record exists, retrieve the encrypted contacts
         $row = $result->fetch_assoc();
-        $contacts = $row['contacts'];
+        $encrypted_contacts = $row['contacts'];
 
-        $sql = "UPDATE userinfo SET contacts = CONCAT(?, ', ', '$encrypted_contact_name_value') WHERE display_name = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $contacts, $display_name);
+        // Decrypt the contacts
+        $key = hex2bin($key);
+        $contacts = openssl_decrypt($encrypted_contacts, "AES-256-CBC", $key, 0, "1234567812345678");
+        
+            
+        if ($contacts === false) {
+            echo "Decryption failed" . openssl_error_string();
+        } else {
+            echo "Decrypted contacts: $contacts";
+        }
+        
+        // Split the contacts into an array
+        $contacts_array = explode(", ", $contacts);
+
+        // Convert the array to a JSON string
+        $json = json_encode($contacts);
+    } else {
+        // Record does not exist
+        echo "No record found with the given display name";
+    }
     
-    } else {
-        // Record does not exist, insert
-        $sql = "INSERT INTO userinfo (display_name, contacts) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $display_name, $encrypted_contact_name_value);
-    }
-
-    // Execute the query
-    if ($stmt->execute() === TRUE) {
-        echo "New record created successfully";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-    // Close the statement
-    $stmt->close();
 }
+
+// Close the statement
+$check_stmt->close();
+
+// Return the JSON string
+echo $json;
+
 ?>

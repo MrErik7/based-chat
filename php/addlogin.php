@@ -52,8 +52,6 @@ $result = $stmt->execute();
 if ($result === TRUE) {
     // Now add the encryption key to the key file
     // Path to the encryption_keys.txt file
-    // Now add the encryption key to the key file
-    // Path to the encryption_keys.txt file
     $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
 
     // Check if the file exists, if not create it

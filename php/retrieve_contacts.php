@@ -16,37 +16,9 @@ if ($conn->connect_error) {
 }
 
 // Get the display and user name from the request
-$display_name = "erik";//$_POST["display_name"];
-$username = "erik";//$_POST["username"];
-
-// Path to the encryption_keys.txt file
-$file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
-
-// Check if the file exists
-if (file_exists($file)) {
-    // Read the file
-    $file_contents = file_get_contents($file);
-
-    // Split the file contents into an array
-    $lines = explode("\n", $file_contents);
-    $encrypted_message = "";
-
-    // Get the encryption key
-    foreach ($lines as $line) {
-        $parts = explode(" | ", $line);
-        $stored_username = $parts[0];
-        $key = $parts[1];
-
-        if ($stored_username == $username) {
-            $key = $parts[1];
-            echo $key;
-            break;
-        }
-    }
-} else {
-    echo "Encryption key file not found";
-    return;
-}
+$display_name = $_SESSION["display_name"];
+$username = $_SESSION["username"];
+$contacts = array();
 
 // Validate the input
 if(empty($display_name)) {
@@ -64,34 +36,54 @@ if(empty($display_name)) {
         // Record exists, retrieve the encrypted contacts
         $row = $result->fetch_assoc();
         $encrypted_contacts = $row['contacts'];
+        $encrypted_contacts_array = explode(', ', $encrypted_contacts); 
 
-        // Decrypt the contacts
-        $key = hex2bin($key);
-        $contacts = openssl_decrypt($encrypted_contacts, "AES-256-CBC", $key, 0, "1234567812345678");
-        
-            
-        if ($contacts === false) {
-            echo "Decryption failed" . openssl_error_string();
-        } else {
-            echo "Decrypted contacts: $contacts";
-        }
-        
-        // Split the contacts into an array
-        $contacts_array = explode(", ", $contacts);
-
-        // Convert the array to a JSON string
-        $json = json_encode($contacts);
     } else {
-        // Record does not exist
-        echo "No record found with the given display name";
+        echo "record doesnt exist";
+        return;
+    }
+
+    // Path to the encryption_keys.txt file
+    $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
+
+    // Check if the file exists
+    if (file_exists($file)) {
+        // Read the file
+        $file_contents = file_get_contents($file);
+
+        // Split the file contents into an array
+        $lines = explode("\n", $file_contents);
+        $encrypted_message = "";
+
+        // Get the encryption key
+        foreach ($lines as $line) {
+            $parts = explode(" | ", $line);
+            $stored_username = $parts[0];
+            $key = $parts[1];
+
+            if ($stored_username == $username) {
+                // If the username matches the key then go through each of the encrypted contact, decrypt it and return it to the array $contacts
+                foreach($encrypted_contacts_array as $contact) {
+                    $decrypted_contact = openssl_decrypt($contact, "AES-256-CBC", $key, 0, "1234567812345678");
+                    array_push($contacts, $decrypted_contact);
+                }
+                break;
+
+            }
+        }
+    } else {
+        echo "Encryption key file not found";
+        return;
     }
     
 }
 
-// Close the statement
-$check_stmt->close();
+// Convert the array to a JSON string
+$json = json_encode($contacts);
 
 // Return the JSON string
 echo $json;
 
+// Close the statement
+$check_stmt->close();
 ?>

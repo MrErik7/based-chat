@@ -46,9 +46,7 @@ if ($result->num_rows > 0) {
             // Get the username from the result
             $username_row = $username_result->fetch_assoc();
             $username = $username_row['username'];
-        } else {
-            echo "0 results";
-        }
+        }    
 
       //  echo $recipient_name;
        // echo $display_name;
@@ -88,9 +86,6 @@ if ($result->num_rows > 0) {
 
     // Convert the array to a JSON string
     $json = json_encode($messages);
-
-} else {
-    echo "0 results";
 }
 
 // Close the database connection

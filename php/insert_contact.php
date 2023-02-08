@@ -72,6 +72,27 @@ if(empty($contact_name) || empty($display_name)) {
         $row = $result->fetch_assoc();
         $contacts = $row['contacts'];
 
+        // Check if the contact is already added 
+        // --> first decrypt the contacts
+        $decrypted_contacts = array();
+        foreach($contacts as $contact) {
+            $decrypted_contact = openssl_decrypt($contact, "AES-256-CBC", $key, 0, "1234567812345678");
+            array_push($decrypted_contacts, $decrypted_contact);
+        }
+
+        // Check if the contact name match any of the names in the list
+        foreach($decrypted_contacts as $contact) {
+            if ($contact == $contact_name) {
+                // A match
+                // Now this works but the javascript needs to know it (?)
+                echo "Contact is already added."
+                return;
+            }
+        }
+
+
+        
+
         $sql = "UPDATE userinfo SET contacts = CONCAT(?, ', ', '$encrypted_contact_name_value') WHERE display_name = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $contacts, $display_name);

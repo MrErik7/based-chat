@@ -125,12 +125,6 @@ function setup() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             let messages = JSON.parse(xhr.responseText);
 
-            // Check if any messages were found
-            if (messages == "No messages found") {
-                console.log("no message found its ok");
-            }
-
-
             // Iterate through the messages and add them to the chat log
             for (let i = 0; i < messages.length; i++) {
                 let message = messages[i];
@@ -143,21 +137,14 @@ function setup() {
     // Retrieve the contacts from the database and display them
     // Send a GET request to retrieve the contacts
     let xhr_contacts = new XMLHttpRequest();
-    xhr_contacts.open("POST", "php/retrieve_contacts.php", true);
-    xhr_contacts.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr_contacts.open("GET", "php/retrieve_contacts.php?username=" + username + "&display_name=" + display_name, true);
     xhr_contacts.onreadystatechange = function () {
         if (xhr_contacts.readyState === 4 && xhr_contacts.status === 200) {
             let contacts = JSON.parse(xhr_contacts.responseText);
 
-            // Check if any messages were found
-            if (contacts == "0 results") {
-                console.log("no contacts found its ok");
-            }
-
             console.log(contacts);
 
-
-            // Iterate through the messages and add them to the chat log
+             // Iterate through the messages and add them to the chat log
             for (let i = 0; i < contacts.length; i++) {
                 let contact = contacts[i];
                 addContact(username, display_name, contact, false);
@@ -165,7 +152,7 @@ function setup() {
         }
         
     };
-    xhr_contacts.send("username=" + username + "&display_name=" + display_name);
+    xhr_contacts.send();
 }
 
 // When the site has been fully loaded --> run the setup

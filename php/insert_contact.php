@@ -38,16 +38,13 @@ if (file_exists($file)) {
         $stored_username = $parts[0];
         $key = $parts[1];
 
-        echo $stored_username;
-
         if ($stored_username == $username) {
             $encrypted_contact_name = openssl_encrypt($contact_name, "AES-256-CBC", $key, 0, "1234567812345678");
-            echo $key;
             break;
         }
     }
 } else {
-    echo "Encryption key file not found";
+   // echo "Encryption key file not found";
     return;
 }
 
@@ -55,62 +52,59 @@ if (file_exists($file)) {
 // Validate the input
 if(empty($contact_name) || empty($display_name)) {
     // if inputs are empty
-    echo "Both fields are required";
+    //echo "Both fields are required";
+    return;
 } else {
-    // Check if the record exists
-    $check_sql = "SELECT * FROM userinfo WHERE display_name = ?";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->bind_param("s", $display_name);
-    $check_stmt->execute();
-    $result = $check_stmt->get_result();
+// Check if the record exists
+$check_sql = "SELECT * FROM userinfo WHERE display_name = ?";
+$check_stmt = $conn->prepare($check_sql);
+$check_stmt->bind_param("s", $display_name);
+$check_stmt->execute();
+$result = $check_stmt->get_result();
 
-    // Fix the encrypted contact
-    $encrypted_contact_name_value = $encrypted_contact_name;
+// Fix the encrypted contact
+$encrypted_contact_name_value = $encrypted_contact_name;
 
-    if ($result->num_rows > 0) {
-        // Record exists, update
-        $row = $result->fetch_assoc();
-        $contacts = $row['contacts'];
+if ($result->num_rows > 0) {
+    // Record exists, update
+    $row = $result->fetch_assoc();
+    $contacts = $row['contacts'];
 
-        // Check if the contact is already added 
-        // --> first decrypt the contacts
-        $decrypted_contacts = array();
-        foreach($contacts as $contact) {
-            $decrypted_contact = openssl_decrypt($contact, "AES-256-CBC", $key, 0, "1234567812345678");
-            array_push($decrypted_contacts, $decrypted_contact);
-        }
-
-        // Check if the contact name match any of the names in the list
-        foreach($decrypted_contacts as $contact) {
-            if ($contact == $contact_name) {
-                // A match
-                // Now this works but the javascript needs to know it (?)
-                echo "Contact is already added."
-                return;
-            }
-        }
-
-
-        
-
-        $sql = "UPDATE userinfo SET contacts = CONCAT(?, ', ', '$encrypted_contact_name_value') WHERE display_name = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $contacts, $display_name);
-    
-    } else {
-        // Record does not exist, insert
-        $sql = "INSERT INTO userinfo (display_name, contacts) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $display_name, $encrypted_contact_name_value);
+    // Check if the contact is already added 
+    // --> first decrypt the contacts
+    $decrypted_contacts = array();
+    $contacts_array = explode(", ", $contacts);
+    foreach($contacts_array as $contact) {
+        $decrypted_contact = openssl_decrypt($contact, "AES-256-CBC", $key, 0, "1234567812345678");
+        array_push($decrypted_contacts, $decrypted_contact);
     }
 
-    // Execute the query
-    if ($stmt->execute() === TRUE) {
-        echo "New record created successfully";
-    } else {
-        echo "Error: " . $stmt->error;
+    // Check if the contact name match any of the names in the list
+    if (in_array($contact_name, $decrypted_contacts)) {
+        // A match
+        echo "false"; //"Contact is already added.";
+        return;
     }
-    // Close the statement
-    $stmt->close();
+
+    $sql = "UPDATE userinfo SET contacts = CONCAT(?, ', ', '$encrypted_contact_name_value') WHERE display_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $contacts, $display_name);
+
+} else {
+    // Record does not exist, insert
+    $sql = "INSERT INTO userinfo (display_name, contacts) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $display_name, $encrypted_contact_name_value);
 }
+
+// Execute the query
+if ($stmt->execute() === TRUE) {
+    echo "true";//"New record created successfully";
+} else {
+    //echo "Error: " . $stmt->error;
+}
+// Close the statement
+$stmt->close();
+}
+
 ?>

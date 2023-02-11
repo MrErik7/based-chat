@@ -46,21 +46,40 @@ function addMessageWithClick() {
 }
 
 // This method adds a new contact to the database, 
-function addContact(username, display_name, contact_display_name, db) {
-    if (db) {
-        // First send a request to upload the contact to the database
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "php/insert_contact.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                // Handle the response from the server
-            }
-        };
-        xhr.send("username=" + username + "&display_name=" + display_name + "&contact_display_name=" + contact_display_name);
-    }
+function addContactDB(username, display_name, contact_display_name) {
+    // First send a request to upload the contact to the database
+    $.ajax({
+        type: "POST",
+        url: "php/insert_contact.php",
+        data: { username: username, display_name: display_name, contact_display_name: contact_display_name },
+        success: function(response) {
+          if (response == "true") {
+            console.log("Contact added successfully.");
+            addContactGUI(contact_display_name);
+
+            return true;
+          } else {
+            console.log("Failed to add contact.");
+            return false;   
+          }
+        }
+      });
     
-   // Create the "div" element to hold the contact
+    /*
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "php/insert_contact.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            return true;
+        }
+    };
+    xhr.send("username=" + username + "&display_name=" + display_name + "&contact_display_name=" + contact_display_name);
+    return false;*/
+}
+
+function addContactGUI(contact_display_name) {
+    // Create the "div" element to hold the contact
    let contact = document.createElement("div");
    contact.className = "message";
    contact.innerHTML = `${contact_display_name}`;
@@ -72,7 +91,10 @@ function addContact(username, display_name, contact_display_name, db) {
 
 function addContactWithClick() {
     let contact_display_name = document.getElementById("contact-user-input").value;
-    addContact(username, display_name, contact_display_name, true); 
+
+    // Add the contact to the database, this function will also check if the contact already exists
+    addContactDB(username, display_name, contact_display_name);
+    
     document.getElementById("contact-user-input").value = "";
 }
 
@@ -147,7 +169,7 @@ function setup() {
              // Iterate through the messages and add them to the chat log
             for (let i = 0; i < contacts.length; i++) {
                 let contact = contacts[i];
-                addContact(username, display_name, contact, false);
+                addContactGUI(contact);
             }
         }
         

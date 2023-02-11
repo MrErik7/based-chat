@@ -92,9 +92,13 @@ label {
     display: flex;    
 }
 
+.chat-aside-container {
+    display: flex;
+    flex-direction: column;
+}
+
 
 .contact-container {
-    border-style: solid;
     margin: 10px;
 }
 

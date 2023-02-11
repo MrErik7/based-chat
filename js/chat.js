@@ -1,6 +1,7 @@
 // Set global variables 
 let display_name = "";
 let username = "";
+let current_chatroom = "all";
 let timestamp = new Date().toUTCString(); //initialize with current timestamp
 
 // This is called when a message is supposed to be displayed
@@ -53,31 +54,23 @@ function addContactDB(username, display_name, contact_display_name) {
         url: "php/insert_contact.php",
         data: { username: username, display_name: display_name, contact_display_name: contact_display_name },
         success: function(response) {
-          if (response == "true") {
-            console.log("Contact added successfully.");
+          if (response == "added") {
+            document.getElementById("contact-input-response").textContent = "Contact added sucessfully.";
             addContactGUI(contact_display_name);
 
-            return true;
-          } else {
-            console.log("Failed to add contact.");
-            return false;   
+          } else if (response == "existent") {
+            document.getElementById("contact-input-response").textContent = "Contact already added.";
+
+          } else if (response == "non-existent") {
+            document.getElementById("contact-input-response").textContent = "Contact doesnt exist.";
           }
+
+          console.log(response);
         }
       });
-    
-    /*
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/insert_contact.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            return true;
-        }
-    };
-    xhr.send("username=" + username + "&display_name=" + display_name + "&contact_display_name=" + contact_display_name);
-    return false;*/
 }
 
+// This method adds a new contact graphiclly
 function addContactGUI(contact_display_name) {
     // Create the "div" element to hold the contact
    let contact = document.createElement("div");
@@ -89,6 +82,7 @@ function addContactGUI(contact_display_name) {
    contactList.appendChild(contact);
 }
 
+// This method handles the "add new contact" button
 function addContactWithClick() {
     let contact_display_name = document.getElementById("contact-user-input").value;
 
@@ -98,6 +92,42 @@ function addContactWithClick() {
     document.getElementById("contact-user-input").value = "";
 }
 
+function addChatroomDB(username, chatroom_id, password, whitelisted_people) {
+    console.log(whitelisted_people);
+    $.ajax({
+        type: "POST",
+        url: "php/insert_chatroom.php",
+        data: { username: username, chatroom_id: chatroom_id, password: password, whitelisted_people: whitelisted_people },
+        success: function(response) {
+        
+
+          console.log(response);
+        }
+      });
+
+}
+
+// Create a new chatroom
+function createChatroom() {
+    // Generate credentials
+    // Generate room id
+    chatroom_id = "";
+    for (let x = 0; x < 9 ;x++) {
+        chatroom_id+=Math.floor(Math.random() * 10);
+    }
+    
+    // Get chatroom password
+    password = document.getElementById("chatroom-password-input").value;
+
+    // Get whitelisted people
+    whitelisted_people = document.getElementById("chatroom-whitelist-input").value;
+    
+    // Add the chatroom to the DB
+    addChatroomDB(username, chatroom_id, password, whitelisted_people);
+
+    document.getElementById("chatroom-password-input").value = "";
+    document.getElementById("chatroom-whitelist-input").value = "";
+}
 
 // This runs once when the site has been fully loaded
 function setup() {
@@ -175,6 +205,14 @@ function setup() {
         
     };
     xhr_contacts.send();
+
+
+    // Set the chatroom header
+    document.getElementById("welcome-current-chat-room").innerHTML = "Chatroom: " + current_chatroom;
+
+    // For debug - will delete later
+    let response = document.getElementById("contact-input-response");
+    response.textContent = "-  response  -";
 }
 
 // When the site has been fully loaded --> run the setup

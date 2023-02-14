@@ -16,10 +16,10 @@ if ($conn->connect_error) {
 }
 
 // Get the info from the request
-$username = $_POST['username'];
-$chatroom_id = $_POST['chatroom_id'];
-$password = $_POST['password'];
-$whitelisted_people = $_POST['whitelisted_people'];
+$username = "admin";//$_POST['username'];
+$chatroom_id = "787878";//$_POST['chatroom_id'];
+$password = "abc123";//$_POST['password'];
+$whitelisted_people = "ERIK"; //$_POST['whitelisted_people'];
 
 // Check if the chatroom already exists
 $check_user_sql = "SELECT * FROM chatrooms WHERE chatroom_id = ?";
@@ -33,6 +33,7 @@ if ($user_result->num_rows > 0) {
     echo "existing";
     return;
 }
+
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -101,6 +102,26 @@ if(empty($password)) {
     }
     // Close the statement
     $stmt->close();
+
+    // Finally lets update the userinfo table for the owner
+    $sql_userinfo_owner = "UPDATE userinfo SET chatrooms = CONCAT(?, ', ', '$chatroom_id') WHERE display_name = ?";
+    $stmt_userinfo_owner = $conn->prepare($sql_userinfo_owner);
+    $stmt_userinfo_owner->bind_param("ss", $chatroom_id, $display_name);
+    
+    // Execute the query
+    if ($stmt_userinfo_owner->execute() === TRUE) {
+        echo "owners table is updated";//"New record created successfully";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    
+    // Then loop through all the whitelisted people to append the chatroom to their "chatroom-invites"
+    foreach ($decrypted_whitelisted_people as $person) {
+        $sql_userinfo_whitelist = "UPDATE userinfo SET chatrooms_invites = CONCAT(?, ', ', '$chatroom_id') WHERE display_name = ?";
+        $stmt_userinfo_whitelist = $conn->prepare($sql_userinfo_whitelist);
+        $stmt_userinfo_whitelist->bind_param("ss", $chatroom_id, $person);
+     
+    }
 }
 
 

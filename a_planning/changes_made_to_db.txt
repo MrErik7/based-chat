@@ -9,3 +9,6 @@ CREATE TABLE chatrooms (
   password VARCHAR(255) NOT NULL,
   whitelisted_people TEXT NOT NULL
 );
+
+ALTER TABLE userinfo
+ADD chatrooms_invites datatype;

@@ -1,1 +1,0 @@
-// Tänker att ja hämtar denna info från userinfo istället

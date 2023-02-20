@@ -16,8 +16,8 @@ if ($conn->connect_error) {
 }
 
 // Get the display and user name from the request
-$display_name = $_SESSION["display_name"];
-$contacts = array();
+$display_name = "sysadmin";//$_POST["display_name"];
+$contacts_requests = array();
 
 // Check if the record exists
 $check_sql = "SELECT * FROM login WHERE display_name = ?";
@@ -29,7 +29,7 @@ $result = $check_stmt->get_result();
 if ($result->num_rows > 0) {
     // Record exists, retrieve the contacts
     $row = $result->fetch_assoc();
-    $contacts = $row['contacts'];
+    $contacts_requests = $row['contacts_requests'];
 
 } else {
     echo "record doesnt exist";
@@ -37,7 +37,7 @@ if ($result->num_rows > 0) {
 }
 
 // Convert the array to a JSON string
-$json = json_encode($contacts);
+$json = json_encode($contacts_requests);
 
 // Return the JSON string
 echo $json;

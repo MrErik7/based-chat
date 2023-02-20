@@ -54,8 +54,8 @@ function addContactDB(username, display_name, contact_display_name) {
         url: "php/insert_contact.php",
         data: { username: username, display_name: display_name, contact_display_name: contact_display_name },
         success: function(response) {
-          if (response == "added") {
-            document.getElementById("contact-input-response").textContent = "Contact added sucessfully.";
+          if (response == "sent") {
+            document.getElementById("contact-input-response").textContent = "Contact request sent successfully.";
             addContactGUI(contact_display_name);
 
           } else if (response == "existent") {
@@ -82,6 +82,21 @@ function addContactGUI(contact_display_name) {
    contactList.appendChild(contact);
 }
 
+function checkContactRequests() {
+    $.ajax({
+        type: "POST",
+        url: "php/retrieve_contacts_requests.php",
+        data: { username: username  },
+        success: function(response) {
+          
+
+          console.log(response);
+        }
+      });
+
+}
+
+
 // This method handles the "add new contact" button
 function addContactWithClick() {
     let contact_display_name = document.getElementById("contact-user-input").value;
@@ -92,6 +107,11 @@ function addContactWithClick() {
     document.getElementById("contact-user-input").value = "";
 }
 
+
+
+
+
+// Add a chatroom to the DB
 function addChatroomDB(username, chatroom_id, password, whitelisted_people) {
     console.log(whitelisted_people);
     $.ajax({
@@ -128,6 +148,7 @@ function createChatroom() {
     document.getElementById("chatroom-password-input").value = "";
     document.getElementById("chatroom-whitelist-input").value = "";
 }
+
 
 // This runs once when the site has been fully loaded
 function setup() {
@@ -189,11 +210,10 @@ function setup() {
     // Retrieve the contacts from the database and display them
     // Send a GET request to retrieve the contacts
     let xhr_contacts = new XMLHttpRequest();
-    xhr_contacts.open("GET", "php/retrieve_contacts.php?username=" + username + "&display_name=" + display_name, true);
+    xhr_contacts.open("GET", "php/retrieve_contacts.php?display_name=" + display_name, true);
     xhr_contacts.onreadystatechange = function () {
         if (xhr_contacts.readyState === 4 && xhr_contacts.status === 200) {
             let contacts = JSON.parse(xhr_contacts.responseText);
-
             console.log(contacts);
 
              // Iterate through the messages and add them to the chat log
@@ -205,7 +225,6 @@ function setup() {
         
     };
     xhr_contacts.send();
-
 
     // Set the chatroom header
     document.getElementById("welcome-current-chat-room").innerHTML = "Chatroom: " + current_chatroom;

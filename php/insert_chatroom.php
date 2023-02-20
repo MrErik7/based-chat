@@ -126,9 +126,9 @@ if(empty($password)) {
     // Finally lets update the userinfo table for the owner
     $update_userinfo_sql = "UPDATE userinfo SET chatrooms = ? WHERE display_name = ?";
     $update_userinfo_stmt = $conn->prepare($update_userinfo_sql);
-    $update_userinfo_stmt->bind_param("ss", $chatrooms, $display_name);
+    $update_userinfo_stmt->bind_param("ss", $new_chatrooms, $display_name);
     $update_userinfo_stmt->execute();     
-        
+
     // Loop through all the whitelisted people to append the chatroom to their "chatroom-invites"
     foreach ($decrypted_whitelisted_people as $person) {
         // First, get the existing list of chatrooms from the userinfo table

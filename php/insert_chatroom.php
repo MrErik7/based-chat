@@ -16,10 +16,11 @@ if ($conn->connect_error) {
 }
 
 // Get the info from the request
-$username = "admin";//$_POST['username'];
-$chatroom_id = "787878";//$_POST['chatroom_id'];
-$password = "abc123";//$_POST['password'];
-$whitelisted_people = "ERIK"; //$_POST['whitelisted_people'];
+$username = $_POST['username'];
+$display_name = $_POST['display_name'];
+$chatroom_id = $_POST['chatroom_id'];
+$password = $_POST['password'];
+$whitelisted_people = $_POST['whitelisted_people'];
 
 // Check if the chatroom already exists
 $check_user_sql = "SELECT * FROM chatrooms WHERE chatroom_id = ?";
@@ -103,24 +104,57 @@ if(empty($password)) {
     // Close the statement
     $stmt->close();
 
-    // Finally lets update the userinfo table for the owner
-    $sql_userinfo_owner = "UPDATE userinfo SET chatrooms = CONCAT(?, ', ', '$chatroom_id') WHERE display_name = ?";
-    $stmt_userinfo_owner = $conn->prepare($sql_userinfo_owner);
-    $stmt_userinfo_owner->bind_param("ss", $chatroom_id, $display_name);
-    
-    // Execute the query
-    if ($stmt_userinfo_owner->execute() === TRUE) {
-        echo "owners table is updated";//"New record created successfully";
-    } else {
-        echo "Error: " . $stmt->error;
+    // First, get the existing list of chatrooms from the userinfo table
+    $get_userinfo_sql = "SELECT chatrooms FROM userinfo WHERE display_name = ?";
+    $get_userinfo_stmt = $conn->prepare($get_userinfo_sql);
+    $get_userinfo_stmt->bind_param("s", $display_name);
+    $get_userinfo_stmt->execute();
+    $userinfo_result = $get_userinfo_stmt->get_result();
+    $chatrooms_invites = "";
+    if ($userinfo_result->num_rows > 0) {
+        $userinfo_row = $userinfo_result->fetch_assoc();
+        $chatrooms = $userinfo_row["chatrooms"];
     }
-    
-    // Then loop through all the whitelisted people to append the chatroom to their "chatroom-invites"
+
+     // Add the new chatroom ID to the existing list
+     if (!empty($chatrooms)) {
+        $new_chatrooms = $chatrooms . ", " . $chatroom_id;
+    } else {
+        $new_chatrooms = $chatroom_id;
+    }
+
+    // Finally lets update the userinfo table for the owner
+    $update_userinfo_sql = "UPDATE userinfo SET chatrooms = ? WHERE display_name = ?";
+    $update_userinfo_stmt = $conn->prepare($update_userinfo_sql);
+    $update_userinfo_stmt->bind_param("ss", $chatrooms, $display_name);
+    $update_userinfo_stmt->execute();     
+        
+    // Loop through all the whitelisted people to append the chatroom to their "chatroom-invites"
     foreach ($decrypted_whitelisted_people as $person) {
-        $sql_userinfo_whitelist = "UPDATE userinfo SET chatrooms_invites = CONCAT(?, ', ', '$chatroom_id') WHERE display_name = ?";
-        $stmt_userinfo_whitelist = $conn->prepare($sql_userinfo_whitelist);
-        $stmt_userinfo_whitelist->bind_param("ss", $chatroom_id, $person);
-     
+        // First, get the existing list of chatrooms from the userinfo table
+        $get_userinfo_sql = "SELECT chatrooms_invites FROM userinfo WHERE display_name = ?";
+        $get_userinfo_stmt = $conn->prepare($get_userinfo_sql);
+        $get_userinfo_stmt->bind_param("s", $person);
+        $get_userinfo_stmt->execute();
+        $userinfo_result = $get_userinfo_stmt->get_result();
+        $chatrooms_invites = "";
+        if ($userinfo_result->num_rows > 0) {
+            $userinfo_row = $userinfo_result->fetch_assoc();
+            $chatrooms_invites = $userinfo_row["chatrooms_invites"];
+        }
+
+        // Add the new chatroom ID to the existing list
+        if (!empty($chatrooms_invites)) {
+            $new_chatrooms_invites = $chatrooms_invites . ", " . $chatroom_id;
+        } else {
+            $new_chatrooms_invites = $chatroom_id;
+        }
+
+        // Update the userinfo table with the new chatroom ID list
+        $update_userinfo_sql = "UPDATE userinfo SET chatrooms_invites = ? WHERE display_name = ?";
+        $update_userinfo_stmt = $conn->prepare($update_userinfo_sql);
+        $update_userinfo_stmt->bind_param("ss", $new_chatrooms_invites, $person);
+        $update_userinfo_stmt->execute();
     }
 }
 

@@ -68,12 +68,6 @@ if ($result === TRUE) {
     fwrite($handle, $username . ' | ' . $key . PHP_EOL);
     fclose($handle);
 
-    // Create an entry in the userinfo table
-    $sql_userinfo = "INSERT INTO userinfo (display_name) VALUES (?)";
-    $stmt_userinfo = $conn->prepare($sql_userinfo);
-    $stmt_userinfo->bind_param("s", $display_name);
-    $stmt_userinfo->execute();
-
     // Redirect back to login
     error_log("A user has been created");
     header("Location: /login.html");

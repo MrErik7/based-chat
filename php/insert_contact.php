@@ -16,9 +16,9 @@ if ($conn->connect_error) {
 }
 
 // Get the info from the request
-$username = "erik";//$_POST['username'];
-$display_name = "ERIK";//$_POST['display_name'];
-$contact_name = "sysadmin";// $_POST['contact_display_name'];
+$username = $_POST['username'];
+$display_name = $_POST['display_name'];
+$contact_name = $_POST['contact_display_name'];
 
 // Check if the contact even exists in the database
 $check_user_sql = "SELECT * FROM login WHERE display_name = ?";
@@ -57,15 +57,27 @@ if(empty($contact_name)) {
             // A match
             echo "existent"; //"Contact is already added.";
             return;
-        }
+        } 
 
         // Get the contact invites list from the contact
         $result->data_seek(0);
         $contacts_requests = $row['contacts_requests'];
 
-        $sql = "UPDATE login SET contacts_requests = CONCAT(?, ', ', '$display_name') WHERE display_name = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $contacts_requests, $contact_name);    
+        if ($contacts_requests == 0) {
+            echo "the insert way";
+            $sql = "UPDATE login SET contacts_requests='$display_name' WHERE display_name=?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $contact_name);   
+
+        } else {
+            echo "the update way";
+            $sql = "UPDATE login SET contacts_requests = CONCAT(?, ', ', '$display_name') WHERE display_name = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $contacts_requests, $contact_name);  
+    
+
+        }
+
     }
 
     // Execute the query

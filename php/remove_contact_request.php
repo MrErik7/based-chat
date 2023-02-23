@@ -16,8 +16,8 @@ if ($conn->connect_error) {
 }
 
 // Get the display name and contact name from the request
-$display_name = "ERIK";//$_POST["display_name"];
-$contact_name = "sysadmin";//$_POST["contact_name"];
+$display_name = $_POST["display_name"];
+$contact_name = $_POST["contact_name"];
 
 // Check if the record exists
 $check_sql = "SELECT * FROM login WHERE display_name = ?";

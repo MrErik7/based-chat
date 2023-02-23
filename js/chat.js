@@ -97,7 +97,7 @@ function checkContactRequests() {
 
       response = JSON.parse(response);
 
-      if (response.class == null ) {
+      if (response == null ) {
         return;
       }
       var response_array = response.split(",");

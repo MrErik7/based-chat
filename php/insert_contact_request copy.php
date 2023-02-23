@@ -58,17 +58,23 @@ if(empty($contact_name)) {
             return;
         } 
 
-        if ($contacts == 0) {
+        // Get the contact invites list from the contact
+        $result->data_seek(0);
+        $contacts_requests = $row['contact_requests'];
+
+        if ($contacts_requests == 0) {
             echo "the insert way";
-            $sql = "UPDATE login SET contacts='$display_name' WHERE display_name=?";
+            $sql = "UPDATE login SET contact_requests='$display_name' WHERE display_name=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $contact_name);   
 
         } else {
             echo "the update way";
-            $sql = "UPDATE login SET contacts = CONCAT(?, ', ', '$display_name') WHERE display_name = ?";
+            $sql = "UPDATE login SET contact_requests = CONCAT(?, ', ', '$display_name') WHERE display_name = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $contacts, $contact_name);  
+            $stmt->bind_param("ss", $contacts_requests, $contact_name);  
+    
+
         }
 
     }

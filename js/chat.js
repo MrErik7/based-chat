@@ -2,6 +2,7 @@
 let display_name = "";
 let username = "";
 let current_chatroom = "all";
+let current_contact_requests = [];
 let timestamp = new Date().toUTCString(); //initialize with current timestamp
 
 // This is called when a message is supposed to be displayed
@@ -51,7 +52,7 @@ function addContactDB(username, display_name, contact_display_name) {
   // First send a request to upload the contact to the database
   $.ajax({
     type: "POST",
-    url: "php/insert_contact.php",
+    url: "php/insert_contact_request.php",
     data: { username: username, display_name: display_name, contact_display_name: contact_display_name },
     success: function (response) {
       if (response == "sent") {
@@ -86,7 +87,7 @@ function checkContactRequests() {
   console.log("searching for friend requests");
   $.ajax({
     type: "POST",
-    url: "php/retrieve_contacts_requests.php",
+    url: "php/retrieve_contact_requests.php",
     data: { display_name: display_name },
     success: function (response) {
       
@@ -94,25 +95,29 @@ function checkContactRequests() {
         return;
       }
 
-      if (response == null) {
+      response = JSON.parse(response);
+
+      if (response.class == null ) {
         return;
       }
-
-
-
-      response = JSON.parse(response);
       var response_array = response.split(",");
       console.log(response);
 
       // Display a separate notification for each new contact request
       for (var i = 0; i < response_array.length; i++) {
 
+        // Check if the contact request already exist
+        if (current_contact_requests.includes(response_array[i])) {
+          continue;
+        }
+
         console.log("lopp throug");
         var notificationContainer = $("#notification-container");
-        var notification = $("<div>", { class: "notification" });
+        var notification = $("<div>", { class: "notification", id: "notification-" + i });
         var notificationText = $("<p>", { class: "notification-text", text: "You have a new contact request from " + String(response_array[i]) });
         var acceptButton = $("<button>", { class: "notification-button accept-button", text: "Accept" });
         var denyButton = $("<button>", { class: "notification-button deny-button", text: "Deny" });
+        
         notification.append(notificationText);
         notification.append(acceptButton);
         notification.append(denyButton);
@@ -120,22 +125,47 @@ function checkContactRequests() {
         notification.show();
 
         // Set the accept and deny button click handlers
-        acceptButton.click(function () {
-          // Handle the accept button click for this request
-          // ...
-          notification.hide();
-        });
-        denyButton.click(function () {
-          // Handle the deny button click for this request
-          
-          notification.hide();
-        });
+        acceptButton.click(function() { notificationAccept(response_array[i], notification) })
+        denyButton.click(function() { notificationDeny(response_array[i], notification) })
+        
+        // Add it to the contact request array
+        current_contact_requests.push(response_array[i])
+
 
       }
     }
   });
 }
 
+function notificationAccept(contact, notification) {
+  console.log("Accepted contact request from " + contact);
+  
+  // Send an AJAX request to add the contact to the user's contacts
+  $.ajax({
+    type: "POST",
+    url: "php/insert_contact.php",
+    data: { display_name: display_name, contact: contact },
+    success: function(response) {
+      console.log(response);
+      notification.hide();
+    }
+  });
+}
+
+function notificationDeny(contact, notification) {
+  console.log("Denied contact request from " + contact);
+  
+  // Send an AJAX request to remove the contact request from the database
+  $.ajax({
+    type: "POST",
+    url: "php/remove_contact_request.php",
+    data: { display_name: display_name, contact: contact },
+    success: function(response) {
+      console.log(response);
+      notification.hide();
+    }
+  });
+}
 
 // This method handles the "add new contact" button
 function addContactWithClick() {
@@ -271,6 +301,7 @@ function setup() {
   // Fix the notification interval
   checkContactRequests();
   setInterval(checkContactRequests, 1000);
+  
 
   // For debug - will delete later
   let response = document.getElementById("contact-input-response");

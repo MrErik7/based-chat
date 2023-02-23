@@ -29,7 +29,7 @@ $result = $check_stmt->get_result();
 if ($result->num_rows > 0) {
     // Record exists, retrieve the contacts
     $row = $result->fetch_assoc();
-    $contacts_requests = $row['contacts_requests'];
+    $contacts_requests = $row['contact_requests'];
 
 } else {
     echo "non-existent";

@@ -19,6 +19,12 @@ if ($conn->connect_error) {
 $display_name = $_POST['display_name'];
 $contact_name = $_POST['contact_display_name'];
 
+// Validate so the display and contact name isnt the same 
+if ($display_name == $contact_name) {
+    echo "same-name";
+    return;
+}
+
 // Check if the contact even exists in the database
 $check_user_sql = "SELECT * FROM login WHERE display_name = ?";
 $check_user_stmt = $conn->prepare($check_user_sql);
@@ -51,30 +57,34 @@ if(empty($contact_name)) {
         $contacts = $row['contacts'];
 
         $contacts_array = explode(", ", $contacts);
-        // Check if the contact name match any of the names in the list
-        if (in_array($contact_name, $contacts_array)) {
+
+        // Check if the name of the user match any of the names in the list
+        if (in_array($display_name, $contacts_array)) {
             // A match
             echo "existent"; //"Contact is already added.";
             return;
-        } 
+        }
+
+        // Check if the contact request has already been sent by the user
+        $contact_requests = $row['contact_requests'];
+        if ($contact_requests !== 0) {
+            $requests_array = explode(", ", $contact_requests);
+            if (in_array($display_name, $requests_array)) {
+                echo "already sent"; //"Contact request has already been sent to this user.";
+                return;
+            }
+        }
 
         // Get the contact invites list from the contact
-        $result->data_seek(0);
-        $contacts_requests = $row['contact_requests'];
-
-        if ($contacts_requests == 0) {
-            echo "the insert way";
+        if ($contact_requests == 0) {
             $sql = "UPDATE login SET contact_requests='$display_name' WHERE display_name=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $contact_name);   
 
         } else {
-            echo "the update way";
             $sql = "UPDATE login SET contact_requests = CONCAT(?, ', ', '$display_name') WHERE display_name = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $contacts_requests, $contact_name);  
-    
-
+            $stmt->bind_param("ss", $contact_requests, $contact_name);  
         }
 
     }
@@ -87,6 +97,5 @@ if(empty($contact_name)) {
     }
     // Close the statement
     $stmt->close();
- 
 }
 ?>

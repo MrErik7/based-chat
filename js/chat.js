@@ -1,9 +1,11 @@
 // Set global variables 
 let display_name = "";
 let username = "";
-let current_chatroom = "all";
-let current_contact_requests = [];
 let timestamp = new Date().toUTCString(); //initialize with current timestamp
+
+// Notifications
+let notification;
+let current_contact_requests = [];
 
 // This is called when a message is supposed to be displayed
 function addMessage(text, sender, recipient_name, timestamp, db) {
@@ -47,9 +49,9 @@ function addMessageWithClick() {
   document.getElementById("chat-msg-input").value = "";
 }
 
-// This method adds a new contact to the database, 
+// This method adds a new contact request to the database, 
 function addContactDB(username, display_name, contact_display_name) {
-  // First send a request to upload the contact to the database
+  // First send a request to upload the contact request to the database
   $.ajax({
     type: "POST",
     url: "php/insert_contact_request.php",
@@ -57,13 +59,19 @@ function addContactDB(username, display_name, contact_display_name) {
     success: function (response) {
       if (response == "sent") {
         document.getElementById("contact-input-response").textContent = "Contact request sent successfully.";
-        addContactGUI(contact_display_name);
 
       } else if (response == "existent") {
         document.getElementById("contact-input-response").textContent = "Contact already added.";
 
       } else if (response == "non-existent") {
         document.getElementById("contact-input-response").textContent = "Contact doesnt exist.";
+
+      } else if (response == "already sent") {
+        document.getElementById("contact-input-response").textContent = "Request already sent.";
+
+      } else if (response == "same-name") {
+        document.getElementById("contact-input-response").textContent = "You cant add yourself idiot.";
+
       }
 
       console.log(response);
@@ -71,17 +79,46 @@ function addContactDB(username, display_name, contact_display_name) {
   });
 }
 
-// This method adds a new contact graphiclly
 function addContactGUI(contact_display_name) {
   // Create the "div" element to hold the contact
   let contact = document.createElement("div");
-  contact.className = "message";
+  contact.className = "contact";
   contact.innerHTML = `${contact_display_name}`;
+
+  // Create the "remove contact" button
+  let removeButton = document.createElement("button");
+  removeButton.innerText = "Remove Contact";
+  removeButton.onclick = function() {
+    $.ajax({
+      type: "POST",
+      url: "php/remove_contact.php",
+      data: { display_name: display_name, contact_name: current_contact_requests[0] },
+      success: function(response) {
+        console.log(response);
+        document.getElementById("contact-list").removeChild(contact)
+      }
+    });
+    
+
+  }
+
+  // Create the "open dm" button
+  let dmButton = document.createElement("button");
+  dmButton.innerText = "Open DM";
+  dmButton.onclick = function() {
+    // Code to open DM with contact
+    console.log("open dm")
+  }
+
+  // Append buttons to contact div
+  contact.appendChild(removeButton);
+  contact.appendChild(dmButton);
 
   // Append the message to the contact-list
   let contactList = document.getElementById("contact-list");
   contactList.appendChild(contact);
 }
+
 
 function checkContactRequests() {
   console.log("searching for friend requests");
@@ -113,7 +150,7 @@ function checkContactRequests() {
 
         console.log("lopp throug");
         var notificationContainer = $("#notification-container");
-        var notification = $("<div>", { class: "notification", id: "notification-" + i });
+        notification = $("<div>", { class: "notification", id: "notification-" + i });
         var notificationText = $("<p>", { class: "notification-text", text: "You have a new contact request from " + String(response_array[i]) });
         var acceptButton = $("<button>", { class: "notification-button accept-button", text: "Accept" });
         var denyButton = $("<button>", { class: "notification-button deny-button", text: "Deny" });
@@ -125,8 +162,8 @@ function checkContactRequests() {
         notification.show();
 
         // Set the accept and deny button click handlers
-        acceptButton.click(function() { notificationAccept(response_array[i], notification) })
-        denyButton.click(function() { notificationDeny(response_array[i], notification) })
+        acceptButton.click(function() { notificationAccept() })
+        denyButton.click(function() { notificationDeny() })
         
         // Add it to the contact request array
         current_contact_requests.push(response_array[i])
@@ -137,29 +174,57 @@ function checkContactRequests() {
   });
 }
 
-function notificationAccept(contact, notification) {
-  console.log("Accepted contact request from " + contact);
+function notificationAccept() {
+  console.log("Accepted contact request from " + current_contact_requests[0]);
   
-  // Send an AJAX request to add the contact to the user's contacts
+  // Send an AJAX request to add the contact to the requesting persons contacts
   $.ajax({
     type: "POST",
     url: "php/insert_contact.php",
-    data: { display_name: display_name, contact: contact },
+    data: { display_name: display_name, contact_name: current_contact_requests[0] },
     success: function(response) {
       console.log(response);
       notification.hide();
     }
   });
+
+  // Send an AJAX request to add the contact to the users contacts
+  $.ajax({
+    type: "POST",
+    url: "php/insert_contact.php",
+    data: { display_name: current_contact_requests[0], contact_name: display_name },
+    success: function(response) {
+      console.log(response);
+    }
+  });
+
+  // And then finally remove the request from the database
+  // Send an AJAX request to remove the contact request from the database
+  $.ajax({
+    type: "POST",
+    url: "php/remove_contact_request.php",
+    data: { display_name: display_name, contact_name: current_contact_requests[0] },
+    success: function(response) {
+      console.log(response);
+      notification.hide();
+    }
+  });
+
+  // Update the visual part
+  addContactGUI(current_contact_requests[0]);
+
+  // And at last reset the array
+  current_contact_requests.length = 0;
 }
 
-function notificationDeny(contact, notification) {
-  console.log("Denied contact request from " + contact);
+function notificationDeny() {
+  console.log("Denied contact request from " + current_contact_requests[0]);
   
   // Send an AJAX request to remove the contact request from the database
   $.ajax({
     type: "POST",
     url: "php/remove_contact_request.php",
-    data: { display_name: display_name, contact: contact },
+    data: { display_name: display_name, contact_name: current_contact_requests[0] },
     success: function(response) {
       console.log(response);
       notification.hide();
@@ -285,9 +350,12 @@ function setup() {
         return;
       }
 
-      // Iterate through the messages and add them to the chat log
-      for (let i = 0; i < contacts.length; i++) {
-        let contact = contacts[i];
+      contacts_array = contacts.split(",")
+
+      // Iterate through the contacts and add them to the ccontact list
+      for (let i = 0; i < contacts_array.length; i++) {
+        let contact = contacts_array[i];
+        console.log(contact);
         addContactGUI(contact);
       }
     }
@@ -296,7 +364,7 @@ function setup() {
   xhr_contacts.send();
 
   // Set the chatroom header
-  document.getElementById("welcome-current-chat-room").innerHTML = "Chatroom: " + current_chatroom;
+  document.getElementById("welcome-current-chat-room").innerHTML = "Chatroom: all";
 
   // Fix the notification interval
   checkContactRequests();

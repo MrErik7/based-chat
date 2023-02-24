@@ -43,6 +43,18 @@ if ($result->num_rows > 0) {
     exit;
 }
 
+// check if the specified display name already exists
+$sql = "SELECT * FROM login WHERE display_name=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $display_name);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows > 0) {
+    // Redirect back to the login page
+    header("Location: /register.html?error=Display name already exists");
+    exit;
+}
+
 // insert the username and hashed password into the database
 $sql = "INSERT INTO login (display_name, username, password) VALUES (?, ?, ?)";
 $stmt = $conn->prepare($sql);

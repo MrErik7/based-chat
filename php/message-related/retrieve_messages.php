@@ -15,8 +15,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the display_name 
-$display_name = $_SESSION['display_name'];
+// Get the display name and contact name from the request
+$display_name = "ERIK";//$_POST["display_name"];
+$contact_name = "sysadmin";//$_POST["contact_name"];
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';
@@ -51,7 +52,7 @@ if ($result->num_rows > 0) {
       //  echo $recipient_name;
        // echo $display_name;
 
-        if ($recipient_name == $display_name) {
+        if ($recipient_name == $display_name && $sender_name == $contact_name) {
             // Check if the file exists
             if (file_exists($file)) {
                 // Read the file

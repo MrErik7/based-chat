@@ -2,6 +2,7 @@
 let display_name = "";
 let username = "";
 let timestamp = new Date().toUTCString(); //initialize with current timestamp
+let current_chatroom = "all";
 
 // Notifications
 let notification;
@@ -92,7 +93,7 @@ function addContactGUI(contact_display_name) {
     $.ajax({
       type: "POST",
       url: "php/remove_contact.php",
-      data: { display_name: display_name, contact_name: current_contact_requests[0] },
+      data: { display_name: display_name, contact_name: contact_display_name },
       success: function(response) {
         console.log(response);
         document.getElementById("contact-list").removeChild(contact)
@@ -106,8 +107,30 @@ function addContactGUI(contact_display_name) {
   let dmButton = document.createElement("button");
   dmButton.innerText = "Open DM";
   dmButton.onclick = function() {
-    // Code to open DM with contact
-    console.log("open dm")
+    // open DM with contact
+    // Set variables
+    current_chatroom = contact_display_name;
+
+    // Set the chatroom header
+    document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
+    
+    // Retreive the messages from the person
+    $.ajax({
+      type: "POST",
+      url: "php/message-related/retrieve_messages.php",
+      data: { display_name: display_name, contact_name: contact_display_name },
+      success: function(response) {
+        console.log(response);
+        let messages = JSON.parse(response);
+
+        // Iterate through the messages and add them to the chat log
+        for (let i = 0; i < messages.length; i++) {
+          let message = messages[i];
+          addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
+        }
+        }
+    });
+
   }
 
   // Append buttons to contact div
@@ -127,7 +150,8 @@ function checkContactRequests() {
     url: "php/retrieve_contact_requests.php",
     data: { display_name: display_name },
     success: function (response) {
-      
+      console.log(current_contact_requests)
+
       if (response == "non-existent") {
         return;
       }
@@ -323,20 +347,21 @@ function setup() {
 
   // Retrieve the messages from the database and display them
   // Send a GET request to retrieve the messages
-  let xhr = new XMLHttpRequest();
-  xhr.open("GET", "php/retrieve_messages.php?display_name=" + display_name, true);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      let messages = JSON.parse(xhr.responseText);
+  $.ajax({
+    type: "POST",
+    url: "php/message-related/retrieve_messages.php",
+    data: { display_name: display_name, contact_name: current_chatroom },
+    success: function(response) {
+      console.log(response);
+      let messages = JSON.parse(response);
 
       // Iterate through the messages and add them to the chat log
       for (let i = 0; i < messages.length; i++) {
         let message = messages[i];
         addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
       }
-    }
-  };
-  xhr.send();
+      }
+  });
 
   // Retrieve the contacts from the database and display them
   // Send a GET request to retrieve the contacts
@@ -364,7 +389,7 @@ function setup() {
   xhr_contacts.send();
 
   // Set the chatroom header
-  document.getElementById("welcome-current-chat-room").innerHTML = "Chatroom: all";
+  document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
 
   // Fix the notification interval
   checkContactRequests();

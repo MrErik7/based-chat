@@ -20,6 +20,7 @@ $sender_name = $_POST["sender_name"];
 $recipient_name = $_POST["recipient_name"];
 $message_text = $_POST["message_text"];
 $timestamp = $_POST["timestamp"];
+$username = $_POST["username"];
 
 // Validate the input
 if(empty($sender_name) || empty($message_text)) {
@@ -27,9 +28,6 @@ if(empty($sender_name) || empty($message_text)) {
     echo "Both fields are required";
     return;
 } 
-
-// Get the username from the URL
-$username = $_GET['username'];
 
 // Path to the encryption_keys.txt file
 $file = $_SERVER['DOCUMENT_ROOT'] . '/encryption_keys.txt';

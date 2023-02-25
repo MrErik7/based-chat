@@ -33,7 +33,6 @@ if ($result->num_rows > 0) {
 
         session_start();
         $_SESSION['display_name'] = $display_name;
-        $_SESSION['username'] = $username;
 
         // Redirect to the main page
         header("Location: /chat.html");

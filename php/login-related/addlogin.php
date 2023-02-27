@@ -16,11 +16,19 @@ if ($conn->connect_error) {
 $display_name = trim($_POST['display_name']);
 $username = trim($_POST['username']);
 $password = trim($_POST['password']);
+$retype_password = trim($_POST['retype-password']);
 
 if (empty($display_name) || empty($username) || empty($password)) {
-        // Redirect back to the login page
+        // Redirect back to the register page
         header("Location: /register.html?error=Enter all fields");
         exit;
+}
+
+if ($password != $retype_password) {
+    // Redirect back to the register page
+    header("Location: /register.html?error=Passwords doesnt match");
+    exit;
+
 }
 
 // hash the password with Argon2

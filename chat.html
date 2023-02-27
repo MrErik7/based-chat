@@ -15,12 +15,14 @@
 <body>
 
 
-    <h1 class="brand-name">Based-Chat</h1>
-    <h2 id="welcome-display-name"></h2>
     <div class="chat-main-container">
-
+    
         <div class="chat-aside-container">
+            
             <div class="contact-container">
+                <button class="dark-mode-button" onclick="toggleDarkMode()">Toggle dark mode</button>
+
+                <button class="all-button" onclick="switchChatroomAll()">Chat with all</button>
                 <div class="contact-input-container">
                     <h2>Add new contact:</h2>
                     <div class="contact-input-container-layer-two">
@@ -35,32 +37,24 @@
 
                 </div>
 
+                <h2>Contacts:</h2>
                 <div class="contact-list" id="contact-list"></div>
             </div>
-<!--
-            <div class="chatroom-container">
-                <div class="chatroom-input-container">
-                    <h2><u>Create new chatroom:</u></h2>
-                    <div class="chatroom-input-container-layer-two">
-                        <h3>Room id will be randomly generated</h3>
-                        <label for="chatroom-password-input">Password:</label>
-                        <input type="text" class="chatroom-input" id="chatroom-password-input" placeholder="Enter your password" required>
-                        <label for="chatroom-whitelist-input">Whitelisted people (separated with ","):</label>
-                        <input type="text" class="chatroom-input" id="chatroom-whitelist-input" placeholder="Enter whitelisted people" required>
-                        <button class="add-button" onclick="createChatroom()">Create</button>
-                    </div>
-                    <div id="chatroom-input-response"></div>
-                </div>
-                <div class="chatroom-list" id="chatroom-list">
-                    <p>123456</p>
-                </div>
-            </div>
--->
         </div>
 
         <div class="chat-container">
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+            <h1 class="brand-name">Based-Chat</h1>
+
+            <h2 id="welcome-display-name"></h2>
+
             <h2 id="welcome-current-chat-room"></h2>
-            <button class="all-button" onclick="switchChatroomAll()">Chat with all</button>
             <div class="chat-log" id="chat-log">
             </div>
 

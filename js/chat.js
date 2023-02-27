@@ -355,6 +355,12 @@ function retrieveContacts(display_name) {
   });
 }
 
+
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+
+}
+
 // This runs once when the site has been fully loaded
 function setup() {
   // Create a promise for retrieving the display name

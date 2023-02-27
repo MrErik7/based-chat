@@ -16,8 +16,8 @@ if ($conn->connect_error) {
 }
 
 // Get the message text and sender's name from the request
-$sender_name = $_POST["sender_name"];
-$recipient_name = $_POST["recipient_name"];
+$sender_name = trim($_POST["sender_name"]);
+$recipient_name = trim($_POST["recipient_name"]);
 $message_text = $_POST["message_text"];
 $timestamp = $_POST["timestamp"];
 $username = $_POST["username"];
@@ -46,9 +46,6 @@ if (file_exists($file)) {
         $parts = explode(" | ", $line);
         $stored_username = $parts[0];
         $key = $parts[1];
-
-        echo $stored_username;
-        echo $username;
 
         if ($stored_username == $username) {
             $encrypted_message = openssl_encrypt($message_text, "AES-256-CBC", $key, 0, "1234567812345678");

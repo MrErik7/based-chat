@@ -147,26 +147,8 @@ function addContactGUI(contact_display_name) {
     document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
     
     // Retreive the messages from the person
-    $.ajax({
-      type: "POST",
-      url: "php/message-related/retrieve_messages.php",
-      data: { display_name: display_name, contact_name: contact_display_name },
-      success: function(response) {
-        console.log(response);
+    retrieveMessages();
 
-        if (response == "no-found") {
-          return;
-        }
-
-        let messages = JSON.parse(response);
-
-        // Iterate through the messages and add them to the chat log
-        for (let i = 0; i < messages.length; i++) {
-          let message = messages[i];
-          addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
-        }
-        }
-    });
 
   }
 
@@ -267,7 +249,7 @@ function notificationAccept() {
   });
 
   // Update the visual part
-  addContactGUI(current_contact_requests[0]);
+  addContactGUI(current_contact_requests[0].trim());
 
   // And at last reset the array
   current_contact_requests.length = 0;
@@ -315,6 +297,7 @@ function switchChatroomAll() {
 
 function retrieveMessages() {
   // Send a request to retrieve the messages
+  console.log(current_chatroom);
   $.ajax({
     type: "POST",
     url: "php/message-related/retrieve_messages.php",
@@ -364,7 +347,7 @@ function retrieveContacts() {
       // Iterate through the contacts and add them to the contact list
       for (let i = 0; i < contacts_array.length; i++) {
         let contact = contacts_array[i];
-        addContactGUI(contact);
+        addContactGUI(contact.trim());
       }
     }
 

@@ -47,6 +47,9 @@ if (file_exists($file)) {
         $stored_username = $parts[0];
         $key = $parts[1];
 
+        echo $stored_username;
+        echo $username;
+
         if ($stored_username == $username) {
             $encrypted_message = openssl_encrypt($message_text, "AES-256-CBC", $key, 0, "1234567812345678");
             break;

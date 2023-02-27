@@ -105,6 +105,9 @@ function addContactGUI(contact_display_name) {
       }
     });
 
+    // Switch back to the public chatroom
+    switchChatroomAll();
+
     alert("Contact successfully removed.")
 
     
@@ -237,7 +240,7 @@ function notificationAccept() {
   // Send an AJAX request to add the contact to the users contacts
   $.ajax({
     type: "POST",
-    url: "php/insert_contact.php",
+    url: "php/contact-related/insert_contact.php",
     data: { display_name: current_contact_requests[0], contact_name: display_name },
     success: function(response) {
       console.log(response);
@@ -293,6 +296,9 @@ function addContactWithClick() {
 function switchChatroomAll() {
   current_chatroom = "all";
   document.getElementById("chat-log").innerHTML = "";
+
+  // Retrieve the messages
+  retrieveMessages(display_name);
   
   // Set the chatroom header
   document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
@@ -394,6 +400,19 @@ function setup() {
   // Fix the notification interval
   checkContactRequests();
   setInterval(checkContactRequests, 1000);
+
+  // Set the event listener for the send button - so the user can press enter instead
+  // Execute a function when the user presses a key on the keyboard
+  document.getElementById("chat-msg-input").addEventListener("keypress", function(event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      
+      // Add the message
+      addMessageWithClick();
+    }
+  });
 
 
   // For debug - will delete later

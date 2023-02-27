@@ -14,7 +14,6 @@ if ($conn->connect_error) {
 
 // Get the display name from the request
 $display_name = $_POST["display_name"];
-echo $display_name;
 
 // Retrieve the username from the login table
 $sql = "SELECT username FROM login WHERE display_name = ?";

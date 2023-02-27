@@ -47,11 +47,17 @@ if ($result->num_rows > 0) {
             // Get the username from the result
             $username_row = $username_result->fetch_assoc();
             $username = $username_row['username'];
-        }    
+        }   
+        
+        if ($recipient_name == "all" && $contact_name == "all") {
+            $message_to_all = true;
+        } else {
+            $message_to_all = false;
+        }
 
         // Retrieve all the messages regarding the two people involved
-        if ($recipient_name == $display_name || $sender_name == $display_name) {
-            if ($recipient_name == $contact_name || $sender_name == $contact_name) {
+        if ($recipient_name == $display_name || $sender_name == $display_name || $message_to_all) {
+            if ($recipient_name == $contact_name || $sender_name == $contact_name || $message_to_all) {
                 // Check if the file exists
                 if (file_exists($file)) {
                     // Read the file

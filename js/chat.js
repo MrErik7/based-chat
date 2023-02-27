@@ -11,7 +11,6 @@ let current_contact_requests = [];
 // This is called when a message is supposed to be displayed
 function addMessage(text, sender, recipient_name, timestamp, db) {
   // Check if its a new message
-  console.log(username);
   if (db) {
     // First send a request to upload the message to the database logs
     $.ajax({
@@ -84,7 +83,14 @@ function addContactGUI(contact_display_name) {
 
   // Create the "remove contact" button
   let removeButton = document.createElement("button");
-  removeButton.innerText = "Remove Contact";
+  removeButton.innerText = "X";
+  removeButton.style.border = "none";
+  removeButton.style.background = "none";
+  removeButton.style.padding = "0";
+  removeButton.style.fontSize = "16px";
+  removeButton.style.marginLeft = "10px";
+  removeButton.style.cursor = "pointer";
+
   removeButton.onclick = function() {
     $.ajax({
       type: "POST",
@@ -110,54 +116,59 @@ function addContactGUI(contact_display_name) {
 
     alert("Contact successfully removed.")
 
-    
 
   }
 
-    // Create the "open dm" button
-    let dmButton = document.createElement("button");
-    dmButton.innerText = "Open DM";
-    dmButton.onclick = function() {
+  // Create the "open dm" button
+  let dmButton = document.createElement("button");
+  dmButton.innerHTML = '<img src="img/dm_icon.png">';
+  dmButton.style.border = "none";
+  dmButton.style.background = "none";
+  dmButton.style.padding = "0";
+  dmButton.style.marginLeft = "10px";
+  dmButton.style.cursor = "pointer";
 
-      // First check so that this person isnt already active
-      if (current_chatroom == contact_display_name) {
-        console.log("already active");
-        return;
-      }
+  dmButton.onclick = function() {
 
-      // Before we retrieve the messages we need to clear the chatlog
-      document.getElementById("chat-log").innerHTML = "";
-
-      // open DM with contact
-      // Set variables
-      current_chatroom = contact_display_name;
-
-      // Set the chatroom header
-      document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
-      
-      // Retreive the messages from the person
-      $.ajax({
-        type: "POST",
-        url: "php/message-related/retrieve_messages.php",
-        data: { display_name: display_name, contact_name: contact_display_name },
-        success: function(response) {
-          console.log(response);
-
-          if (response == "no-found") {
-            return;
-          }
-
-          let messages = JSON.parse(response);
-
-          // Iterate through the messages and add them to the chat log
-          for (let i = 0; i < messages.length; i++) {
-            let message = messages[i];
-            addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
-          }
-          }
-      });
-
+    // First check so that this person isnt already active
+    if (current_chatroom == contact_display_name) {
+      console.log("already active");
+      return;
     }
+
+    // Before we retrieve the messages we need to clear the chatlog
+    document.getElementById("chat-log").innerHTML = "";
+
+    // open DM with contact
+    // Set variables
+    current_chatroom = contact_display_name;
+
+    // Set the chatroom header
+    document.getElementById("welcome-current-chat-room").innerHTML = "Chatting with: " + current_chatroom;
+    
+    // Retreive the messages from the person
+    $.ajax({
+      type: "POST",
+      url: "php/message-related/retrieve_messages.php",
+      data: { display_name: display_name, contact_name: contact_display_name },
+      success: function(response) {
+        console.log(response);
+
+        if (response == "no-found") {
+          return;
+        }
+
+        let messages = JSON.parse(response);
+
+        // Iterate through the messages and add them to the chat log
+        for (let i = 0; i < messages.length; i++) {
+          let message = messages[i];
+          addMessage(message.message_text, message.sender_name, display_name, message.timestamp, false);
+        }
+        }
+    });
+
+  }
 
   // Append buttons to contact div
   contact.appendChild(removeButton);
@@ -169,14 +180,11 @@ function addContactGUI(contact_display_name) {
 }
 
 function checkContactRequests() {
-  console.log("searching for friend requests");
   $.ajax({
     type: "POST",
     url: "php/contact-related/retrieve_contact_requests.php",
     data: { display_name: display_name },
     success: function (response) {
-      console.log(current_contact_requests)
-
       if (response == "non-existent") {
         return;
       }
@@ -197,7 +205,6 @@ function checkContactRequests() {
           continue;
         }
 
-        console.log("lopp throug");
         var notificationContainer = $("#notification-container");
         notification = $("<div>", { class: "notification", id: "notification-" + i });
         var notificationText = $("<p>", { class: "notification-text", text: "You have a new contact request from " + String(response_array[i]) });
@@ -306,7 +313,7 @@ function switchChatroomAll() {
 }
 
 
-function retrieveMessages(display_name) {
+function retrieveMessages() {
   // Send a request to retrieve the messages
   $.ajax({
     type: "POST",
@@ -319,6 +326,11 @@ function retrieveMessages(display_name) {
         return;
       }
       
+      // First lets clear the chat-log to avoid duplicates
+      let chatlog = document.getElementById("chat-log");
+      chatlog.innerHTML = "";
+
+      // Parse the messages as a json
       let messages = JSON.parse(response);
 
       // Iterate through the messages and add them to the chat log
@@ -330,7 +342,7 @@ function retrieveMessages(display_name) {
   });
 }
 
-function retrieveContacts(display_name) {
+function retrieveContacts() {
   $.ajax({
     type: "POST",
     url: "php/contact-related/retrieve_contacts.php",
@@ -342,12 +354,16 @@ function retrieveContacts(display_name) {
         return;
       }
 
+      // First lets clear the contact list to avoid duplicates
+      let contactList = document.getElementById("contact-list");
+      contactList.innerHTML = "";
+
+      // Split the contacts into an array
       contacts_array = contacts.split(",")
 
       // Iterate through the contacts and add them to the contact list
       for (let i = 0; i < contacts_array.length; i++) {
         let contact = contacts_array[i];
-        console.log(contact);
         addContactGUI(contact);
       }
     }
@@ -356,10 +372,6 @@ function retrieveContacts(display_name) {
 }
 
 
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-
-}
 
 // This runs once when the site has been fully loaded
 function setup() {
@@ -392,8 +404,8 @@ function setup() {
     });
 
     // Retrieve the messages and contacts once the display name and username have been retrieved
-    retrieveMessages(display_name);
-    retrieveContacts(display_name);
+    retrieveMessages();
+    retrieveContacts();
 
   }).catch((error) => {
     console.error(error);
@@ -406,6 +418,13 @@ function setup() {
   // Fix the notification interval
   checkContactRequests();
   setInterval(checkContactRequests, 1000);
+
+  // Fix the retrieveMessage interval
+  // So the messages get updated in realtime
+  setInterval(retrieveMessages, 1000);
+
+  // And same for the contacts
+  setInterval(retrieveContacts, 1000);
 
   // Set the event listener for the send button - so the user can press enter instead
   // Execute a function when the user presses a key on the keyboard
@@ -420,10 +439,6 @@ function setup() {
     }
   });
 
-
-  // For debug - will delete later
-  let response = document.getElementById("contact-input-response");
-  response.textContent = "-  response  -";
 }
 
 // When the site has been fully loaded --> run the setup

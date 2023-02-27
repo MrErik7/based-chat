@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Libre Baskerville' rel='stylesheet'>
+
     <script src="js/chat.js"></script>
     <title>Based Chat</title>
 
@@ -16,57 +18,60 @@
 
 
     <div class="chat-main-container">
-    
-        <div class="chat-aside-container">
-            
-            <div class="contact-container">
-                <button class="dark-mode-button" onclick="toggleDarkMode()">Toggle dark mode</button>
 
-                <button class="all-button" onclick="switchChatroomAll()">Chat with all</button>
-                <div class="contact-input-container">
-                    <h2>Add new contact:</h2>
-                    <div class="contact-input-container-layer-two">
-                        <input type="text" class="contact-input" id="contact-user-input">
-                        <button class="add-button" onclick="addContactWithClick()">Add</button>
-                    </div>
-                    <div id="contact-input-response"></div>
-                </div>
-
-                <div class="notification-container" id="notification-container">
-                    <p>new notifications:</p>
-
-                </div>
-
-                <h2>Contacts:</h2>
-                <div class="contact-list" id="contact-list"></div>
-            </div>
-        </div>
-
-        <div class="chat-container">
+        <div class="chat-header" id="chat-header">
             <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-            <h1 class="brand-name">Based-Chat</h1>
-
             <h2 id="welcome-display-name"></h2>
-
-            <h2 id="welcome-current-chat-room"></h2>
-            <div class="chat-log" id="chat-log">
-            </div>
-
-            <div class="chat-input-container">
-                <input type="text" class="message-input" id="chat-msg-input">
-                <button class="send-button" onclick="addMessageWithClick()">Send</button>
-            </div>
-
-
+            <a href="login.html"><img class="icon" src="img/logout_icon.png"></a>
 
         </div>
+        
+        <div class="chat-content-container">
 
+
+
+            <div class="chat-aside-container">
+
+                <div class="contact-container">
+                    <div class="contact-input-container">
+                        <h2>Add new contact:</h2>
+                        <div class="contact-input-container-layer-two">
+                            <input type="text" class="contact-input" id="contact-user-input">
+                            <button class="add-button" onclick="addContactWithClick()">Add</button>
+                        </div>
+                        <div id="contact-input-response"></div>
+                    </div>
+
+                    <div class="notification-container" id="notification-container">
+
+                    </div>
+
+                    <h2>Contacts:</h2>
+                    <div class="contact-list" id="contact-list"></div>
+                </div>
+
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-container-header">
+                    <h2 id="welcome-current-chat-room"></h2>
+                    <button class="add-button" id="smaller-button" onclick="switchChatroomAll()">Chat with all</button>
+
+                </div>
+                <div class="chat-log" id="chat-log">
+                </div>
+
+                <div class="chat-input-container">
+                    <input type="text" class="message-input" id="chat-msg-input">
+                    <button class="send-button" onclick="addMessageWithClick()">Send</button>
+                </div>
+
+
+
+            </div>
+            
+        </div>
+        
 </body>
 
 </html>
